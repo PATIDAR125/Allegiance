@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Houses — Allegiance Academy | Four Houses. One Spirit.</title>
+<meta name="description" content="The four houses of Allegiance Academy — Raman, Shubhas, Gandhi and Tagore. Competition creates energy. Community creates belonging.">
+<meta name="theme-color" content="#171717">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23171717'/%3E%3Ctext x='32' y='45' font-family='Georgia,serif' font-size='36' fill='%23F7F4ED' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   ALLEGIANCE ACADEMY — HOUSES
+   Single-file build · GSAP + ScrollTrigger + Lenis
+   ============================================================ */
+
+/* ---------- TOKENS ---------- */
+:root{
+  --ivory:#F7F4ED;
+  --charcoal:#171717;
+  --beige:#E9E4D8;
+  --white:#FFFFFF;
+  --ink-2:#121110;
+  --raman:#D64545;
+  --shubhas:#E7C52F;
+  --gandhi:#4C9A68;
+  --tagore:#4D82C4;
+  --line:rgba(23,23,23,.14);
+  --line-lt:rgba(247,244,237,.16);
+  --mut:rgba(23,23,23,.62);
+  --mut-lt:rgba(247,244,237,.72);
+  --serif:'DM Serif Display',Georgia,'Times New Roman',serif;
+  --sans:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --pad:clamp(20px,4.4vw,72px);
+  --ease:cubic-bezier(.22,1,.36,1);
+  --ease-io:cubic-bezier(.65,0,.35,1);
+}
+
+/* ---------- RESET / BASE ---------- */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:auto;-webkit-text-size-adjust:100%}
+html,body{overflow-x:clip}
+html.menu-locked,html.menu-locked body{overflow:hidden}
+body{
+  background:var(--ivory);color:var(--charcoal);
+  font-family:var(--sans);font-size:16px;line-height:1.65;font-weight:400;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit;text-decoration:none}
+ul,ol{list-style:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+figure{margin:0}
+::selection{background:var(--charcoal);color:var(--ivory)}
+:focus-visible{outline:2px solid currentColor;outline-offset:4px}
+[id]{scroll-margin-top:90px}
+.ico{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+.skip{position:fixed;top:-70px;left:16px;z-index:400;background:var(--charcoal);color:var(--ivory);
+  padding:12px 20px;font-size:.7rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;transition:top .3s ease}
+.skip:focus{top:16px}
+
+/* film grain overlay */
+.grain{position:fixed;inset:0;z-index:95;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.7'/%3E%3C/svg%3E");
+  background-size:240px 240px}
+
+/* ---------- TYPE / UTILITIES ---------- */
+.wrap{width:100%;max-width:1680px;margin-inline:auto;padding-inline:var(--pad)}
+.section{position:relative;padding-block:clamp(90px,13vh,170px)}
+.label{font-size:.66rem;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--mut)}
+.theme-dark .label{color:var(--mut-lt)}
+.display{font-family:var(--serif);font-weight:400;line-height:1.05;letter-spacing:-.01em}
+.display em{font-style:italic}
+.sec-head{
+.sec-head--split{align-items:flex-start}
+@media (min-width:900px){.sec-head--split{flex-direction:row;justify-content:space-between;align-items:flex-end;gap:48px}}display:flex;flex-direction:column;gap:22px;margin-bottom:clamp(48px,8vh,96px)}
+.sec-head .label{display:flex;align-items:center;gap:14px}
+.sec-head .label .no{color:var(--charcoal)}
+.theme-dark .sec-head .label .no{color:var(--ivory)}
+.sec-head .label::after{content:"";height:1px;width:56px;background:currentColor;opacity:.35}
+.sec-title{font-size:clamp(2.1rem,5.2vw,4.4rem);max-width:18ch}
+.sec-intro{max-width:38ch;color:var(--mut);line-height:1.85;font-size:.95rem}
+.ml{display:block;overflow:hidden;padding-bottom:.07em;margin-bottom:-.07em}
+.ml__i{display:block;will-change:transform}
+.masklines .ml__i{will-change:transform}
+
+/* house palette bar (multi-colour system motif) */
+.palette{display:flex;height:8px;width:clamp(220px,32vw,400px)}
+.palette i{flex:1;transform-origin:left center;will-change:transform}
+.palette--spirit{height:6px;width:clamp(180px,26vw,320px);margin-bottom:clamp(20px,3vh,32px)}
+
+/* aspect-ratio helpers */
+.a-34{aspect-ratio:3/4}.a-45{aspect-ratio:4/5}.a-11{aspect-ratio:1/1}
+.a-43{aspect-ratio:4/3}.a-1610{aspect-ratio:16/10}.a-169{aspect-ratio:16/9}
+.frame{position:relative;overflow:hidden;background:#232220}
+.frame img{width:100%;height:100%;object-fit:cover}
+.framecap{display:flex;justify-content:space-between;gap:16px;margin-top:14px;
+  font-size:.6rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--mut)}
+
+/* ---------- BUTTONS ---------- */
+.btn{position:relative;display:inline-flex;align-items:center;gap:12px;
+  padding:1.1em 1.7em;border:1px solid currentColor;
+  font-size:.7rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
+  color:inherit;background:transparent;overflow:hidden;cursor:pointer;
+  transition:color .45s var(--ease)}
+.btn>*{position:relative;z-index:1}
+.btn::before{content:"";position:absolute;inset:0;z-index:0;background:var(--fill,var(--charcoal));
+  transform:scaleY(0);transform-origin:bottom;transition:transform .55s var(--ease-io)}
+.btn:hover::before,.btn:focus-visible::before{transform:scaleY(1)}
+.btn:hover,.btn:focus-visible{color:var(--fillink,var(--ivory))}
+.btn .ico{width:15px;height:15px;flex:none;transition:transform .45s var(--ease)}
+.btn:hover .ico,.btn:focus-visible .ico{transform:translateX(5px)}
+.textlink{position:relative;display:inline-flex;align-items:center;gap:10px;
+  font-size:.68rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;padding-bottom:6px}
+.textlink::after{content:"";position:absolute;left:0;bottom:0;height:1px;width:100%;background:currentColor;
+  transform:scaleX(0);transform-origin:right;transition:transform .5s var(--ease-io)}
+.textlink:hover::after,.textlink:focus-visible::after{transform:scaleX(1);transform-origin:left}
+.textlink .ico{width:14px;height:14px;transition:transform .45s var(--ease)}
+.textlink:hover .ico,.textlink:focus-visible .ico{transform:translateX(4px)}
+.btn--solid{background:var(--charcoal);border-color:var(--charcoal);color:var(--ivory);
+  --fill:var(--ivory);--fillink:var(--charcoal)}
+.btn--light{color:var(--ivory);--fill:var(--ivory);--fillink:var(--charcoal)}
+.btn--ivory{background:var(--ivory);border-color:var(--ivory);color:var(--charcoal);
+  --fill:var(--charcoal);--fillink:var(--ivory)}
+.btn--sm{padding:.85em 1.35em;font-size:.64rem}
+
+/* ---------- HEADER ---------- */
+.site-header{position:fixed;top:0;left:0;right:0;z-index:300;
+  --ink:var(--ivory);color:var(--ink);
+  background:transparent;border-bottom:1px solid transparent;
+  transition:background-color .5s var(--ease),border-color .5s var(--ease),color .5s var(--ease)}
+.site-header .bar{display:flex;align-items:center;justify-content:space-between;gap:28px;
+  height:92px;transition:height .5s var(--ease)}
+.site-header.is-scrolled{--ink:var(--charcoal);background:rgba(247,244,237,.94);
+  border-bottom-color:var(--line);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.site-header.is-scrolled .bar{height:66px}
+.brand{display:flex;flex-direction:column;gap:3px;line-height:1}
+.brand__name{font-family:var(--serif);font-size:1.22rem;letter-spacing:.04em;text-transform:uppercase}
+.brand__sub{font-size:.5rem;font-weight:700;letter-spacing:.52em;text-transform:uppercase;opacity:.8}
+.header-end{display:flex;align-items:center;gap:16px}
+.nav{display:none}
+.header-cta{display:none}
+.nav ul{display:flex;align-items:center;gap:clamp(18px,1.9vw,32px)}
+.nav a{position:relative;display:inline-block;padding:8px 0;
+  font-size:.66rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  opacity:.82;transition:opacity .3s ease}
+.nav a::after{content:"";position:absolute;left:0;bottom:2px;width:100%;height:1px;background:currentColor;
+  transform:scaleX(0);transform-origin:right;transition:transform .45s var(--ease-io)}
+.nav a:hover,.nav a:focus-visible{opacity:1}
+.nav a:hover::after,.nav a:focus-visible::after,
+.nav a[aria-current="page"]::after,.nav a[aria-current="true"]::after{transform:scaleX(1);transform-origin:left}
+.nav a[aria-current="page"]{opacity:1}
+@media (min-width:1081px){
+  .nav{display:block}
+  .header-cta{display:inline-flex}
+}
+.nav-toggle{position:relative;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;
+  gap:7px;width:46px;height:46px;margin-right:-8px;padding:8px}
+.nav-toggle .l{display:block;height:2px;width:26px;background:var(--ink);
+  transition:transform .45s var(--ease),width .3s ease,background-color .4s ease}
+.nav-toggle .l:nth-child(2){width:17px}
+@media (min-width:1081px){.nav-toggle{display:none}}
+
+/* ---------- MOBILE MENU (full-screen) ---------- */
+.menu{position:fixed;inset:0;z-index:200;background:var(--charcoal);color:var(--ivory);
+  clip-path:inset(0 0 100% 0);visibility:hidden;overflow-y:auto;overscroll-behavior:contain;
+  transition:clip-path .75s var(--ease-io),visibility 0s linear .75s}
+.menu.is-open{clip-path:inset(0 0 0 0);visibility:visible;
+  transition:clip-path .75s var(--ease-io),visibility 0s linear 0s}
+html.menu-open .site-header{--ink:var(--ivory);background:transparent;border-bottom-color:transparent;backdrop-filter:none;-webkit-backdrop-filter:none}
+html.menu-open .nav-toggle .l{background:var(--ivory)}
+html.menu-open .nav-toggle .l:nth-child(1){width:26px;transform:translateY(4.5px) rotate(45deg)}
+html.menu-open .nav-toggle .l:nth-child(2){width:26px;transform:translateY(-4.5px) rotate(-45deg)}
+.menu__inner{min-height:100%;display:flex;flex-direction:column;justify-content:flex-end;
+  padding:120px var(--pad) 6vh}
+.menu__list{margin-bottom:clamp(30px,6vh,60px)}
+.menu__item{--d:0s}
+.menu__item:nth-child(1){--d:.26s}.menu__item:nth-child(2){--d:.30s}
+.menu__item:nth-child(3){--d:.34s}.menu__item:nth-child(4){--d:.38s}
+.menu__item:nth-child(5){--d:.42s}.menu__item:nth-child(6){--d:.46s}
+.menu__item:nth-child(7){--d:.50s}.menu__item:nth-child(8){--d:.54s}
+.menu__link{display:inline-flex;align-items:baseline;gap:16px;padding:6px 0;
+  font-family:var(--serif);font-size:clamp(1.85rem,6.5vw,3.2rem);line-height:1.12;
+  text-transform:uppercase;letter-spacing:.01em;
+  transform:translateY(115%);
+  transition:transform .75s var(--ease) var(--d),color .3s ease 0s}
+.menu__link .n{font-family:var(--sans);font-size:.62rem;font-weight:700;letter-spacing:.24em;opacity:.5}
+.menu__link:hover,.menu__link:focus-visible{color:var(--beige)}
+.menu__link[aria-current="page"]{color:var(--beige)}
+.menu.is-open .menu__link{transform:translateY(0)}
+.menu__meta{border-top:1px solid var(--line-lt);padding-top:30px;display:grid;gap:28px;grid-template-columns:1fr;
+  opacity:0;transform:translateY(16px);
+  transition:opacity .6s ease .62s,transform .7s var(--ease) .62s}
+.menu.is-open .menu__meta{opacity:1;transform:translateY(0)}
+.menu__meta .label{display:block;margin-bottom:10px;color:var(--mut-lt)}
+.menu__meta p{font-size:.86rem;line-height:1.75}
+.menu__meta a{transition:color .3s}
+.menu__meta a:hover{color:var(--beige)}
+.menu__social{display:flex;flex-wrap:wrap;gap:10px}
+.menu__social a{display:inline-block;font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  border:1px solid rgba(247,244,237,.25);padding:9px 14px;transition:background-color .4s,color .4s,border-color .4s}
+.menu__social a:hover,.menu__social a:focus-visible{background:var(--ivory);color:var(--charcoal);border-color:var(--ivory)}
+@media (min-width:640px){.menu__meta{grid-template-columns:1fr 1fr 1.2fr}}
+@media (max-height:640px){.menu__inner{padding-top:100px}.menu__link{font-size:1.5rem}}
+
+/* ---------- HERO (typographic, multi-colour system) ---------- */
+.hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;color:var(--ivory);
+  overflow:hidden;background:var(--charcoal)}
+@supports not (height:100svh){.hero{min-height:100vh}}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(120% 90% at 85% 10%,rgba(214,69,69,.10),transparent 55%),
+             radial-gradient(120% 90% at 15% 90%,rgba(77,130,196,.10),transparent 55%)}
+.hero__content{position:relative;z-index:2;width:100%;padding-block:0 clamp(110px,16vh,170px)}
+.hero__palette{margin-bottom:clamp(24px,4vh,40px)}
+.hero__label{display:inline-flex;align-items:center;gap:14px;
+  font-size:.66rem;font-weight:700;letter-spacing:.3em;text-transform:uppercase;
+  color:rgba(247,244,237,.75);margin-bottom:clamp(20px,3vh,32px)}
+.hero__label::before{content:"";width:44px;height:1px;background:currentColor}
+.hero__title{font-family:var(--serif);font-weight:400;
+  font-size:clamp(2.3rem,8.6vw,8rem);line-height:.99;letter-spacing:-.005em;text-transform:uppercase}
+.hero__title em{font-style:italic}
+.hero__low{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;
+  gap:clamp(24px,4vw,56px);margin-top:clamp(30px,5vh,48px)}
+.hero__text{max-width:44ch;font-size:clamp(.92rem,1.05vw,1.05rem);line-height:1.8;color:rgba(247,244,237,.85)}
+.hero__scroll{position:absolute;right:var(--pad);bottom:clamp(28px,5vh,54px);z-index:3;display:none;
+  flex-direction:column;align-items:center;gap:12px;
+  font-size:.58rem;font-weight:700;letter-spacing:.32em;text-transform:uppercase;color:rgba(247,244,237,.7)}
+.hero__scroll .line{position:relative;width:1px;height:56px;background:rgba(247,244,237,.28);overflow:hidden}
+.hero__scroll .line::after{content:"";position:absolute;left:0;top:-100%;width:100%;height:100%;background:var(--ivory);
+  animation:scrollLine 2.4s var(--ease-io) infinite}
+@keyframes scrollLine{0%{top:-100%}55%{top:0}100%{top:100%}}
+@media (min-width:900px){.hero__scroll{display:flex}}
+
+/* ---------- HOUSE EXPERIENCE (scroll-tinted canvas) ---------- */
+.hx{position:relative;background:var(--charcoal);color:var(--ivory);
+  transition:background-color 1s ease}
+.hx__house{min-height:92svh;display:flex;align-items:center;
+  padding-block:clamp(80px,14vh,160px)}
+@supports not (height:100svh){.hx__house{min-height:92vh}}
+.hx__house+.hx__house{border-top:1px solid var(--line-lt)}
+.hx__grid{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(24px,3vw,48px);align-items:center;width:100%}
+.hx__text{grid-column:1/-1;display:flex;flex-direction:column;gap:22px}
+.hx__media{grid-column:1/-1}
+.hx__kicker{display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  font-size:.64rem;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--mut-lt)}
+.hx__kicker .no{color:var(--hc,var(--ivory))}
+.hx__kicker::after{content:"";height:1px;width:56px;background:var(--hc,var(--ivory));opacity:.6}
+.hx__title{font-family:var(--serif);font-weight:400;
+  font-size:clamp(3rem,10vw,9rem);line-height:.95;text-transform:uppercase;letter-spacing:-.005em;
+  padding-bottom:.06em}
+.hx__title .ml{padding-bottom:.08em;margin-bottom:-.08em}
+.hx__desc{max-width:50ch;color:rgba(247,244,237,.78);line-height:1.85;font-size:.97rem}
+.hx__spirit{border-left:2px solid var(--hc,var(--ivory));padding-left:18px;
+  display:flex;flex-direction:column;gap:6px}
+.hx__spiritlabel{font-size:.58rem;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--mut-lt)}
+.hx__spirit p{font-family:var(--serif);font-style:italic;font-size:clamp(1.2rem,2vw,1.55rem);line-height:1.3;color:var(--ivory)}
+.hx__honours{border-top:1px solid var(--line-lt);padding-top:18px;
+  display:flex;flex-direction:column;gap:12px}
+.hx__honourslabel{font-size:.58rem;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--mut-lt)}
+.hx__honours ul{display:flex;flex-direction:column;gap:9px}
+.hx__honours li{position:relative;padding-left:16px;
+  font-size:.8rem;color:rgba(247,244,237,.72);display:flex;justify-content:space-between;gap:16px}
+.hx__honours li::before{content:"";position:absolute;left:0;top:.5em;width:6px;height:6px;background:var(--hc,var(--ivory))}
+.hx__honours .yr{flex:none;font-weight:700;letter-spacing:.14em;color:var(--mut-lt)}
+.hx__frame{aspect-ratio:4/3}
+.hx__img{width:100%;height:100%;object-fit:cover;will-change:transform}
+.hx__chip{display:flex;align-items:center;gap:10px;margin-top:14px;
+  font-size:.62rem;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--hc,var(--ivory))}
+.hx__chip i{width:12px;height:12px;flex:none;background:var(--hc,var(--ivory))}
+@media (min-width:1000px){
+  .hx__house--a .hx__text{grid-column:1/7;grid-row:1}
+  .hx__house--a .hx__media{grid-column:7/13;grid-row:1}
+  .hx__house--b .hx__text{grid-column:6/13;grid-row:1}
+  .hx__house--b .hx__media{grid-column:1/6;grid-row:1}
+}
+
+/* ---------- HOUSE LIFE ---------- */
+.hlife__grid{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(16px,3vw,36px)}
+.hlife__item{position:relative}
+.hlife__item:nth-child(even){margin-top:clamp(24px,6vw,56px)}
+.hlife__item--wide{grid-column:1/-1;margin-top:0 !important}
+.hlife__frame img{transition:transform .9s var(--ease)}
+.hlife__item:hover .hlife__frame img{transform:scale(1.05)}
+.hlife__cap{display:flex;justify-content:space-between;gap:12px;margin-top:12px;
+  font-size:.6rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--mut)}
+.hlife__cap .no{color:var(--charcoal)}
+@media (min-width:900px){
+  .hlife__grid{grid-template-columns:repeat(12,1fr)}
+  .hlife__item{grid-column:auto;margin-top:0}
+  .hlife__item--wide{grid-column:auto}
+  .hlife__item--sports{grid-column:1/6}
+  .hlife__item--cultural{grid-column:7/13;margin-top:clamp(60px,10vw,150px)}
+  .hlife__item--academic{grid-column:1/9;margin-top:clamp(30px,5vw,70px)}
+  .hlife__item--leadership{grid-column:9/13;margin-top:clamp(50px,8vw,120px)}
+  .hlife__item--teamwork{grid-column:4/13;margin-top:clamp(20px,4vw,60px)}
+}
+
+/* ---------- HOUSE SPIRIT ---------- */
+.spirit{background:var(--beige)}
+.spirit__inner{display:flex;flex-direction:column;gap:clamp(22px,4vh,36px);align-items:flex-start}
+.spirit__statement{font-family:var(--serif);font-weight:400;
+  font-size:clamp(2.2rem,7vw,7rem);line-height:1.02;text-transform:uppercase;letter-spacing:-.005em}
+.spirit__statement em{font-style:italic}
+.spirit__text{max-width:46ch;color:rgba(23,23,23,.78);line-height:1.85;font-size:clamp(.92rem,1.05vw,1.05rem)}
+
+/* ---------- CLOSING ---------- */
+.close{background:var(--ivory)}
+.close__inner{display:flex;flex-direction:column;gap:clamp(22px,4vh,36px);align-items:flex-start}
+.closing__head{font-size:clamp(1.7rem,3.2vw,2.8rem);max-width:22ch}
+.close__text{max-width:46ch;color:rgba(23,23,23,.78);line-height:1.85;font-size:clamp(.92rem,1.05vw,1.05rem)}
+
+/* ---------- FOOTER ---------- */
+.footer{background:var(--ink-2);color:var(--ivory)}
+.footer__top{padding-block:clamp(90px,14vh,160px) 0}
+.footer__staterow{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;
+  gap:clamp(28px,4vw,60px);padding-bottom:clamp(60px,9vh,100px)}
+.footer__statement{font-family:var(--serif);font-weight:400;
+  font-size:clamp(2.3rem,6.4vw,5.9rem);line-height:1.04;text-transform:uppercase;letter-spacing:-.005em;max-width:12ch}
+.footer__statement em{font-style:italic}
+.footer__cta{position:relative;isolation:isolate;overflow:hidden;flex:1 1 100%;
+  display:flex;flex-direction:column;justify-content:space-between;
+  gap:clamp(30px,4vw,52px);padding:clamp(20px,2.4vw,28px) clamp(20px,2.6vw,32px);
+  border:1px solid rgba(247,244,237,.3);border-radius:2px;color:var(--ivory);
+  text-decoration:none;transition:border-color .5s ease,color .5s ease}
+.footer__cta::before{content:"";position:absolute;inset:0;z-index:0;background:var(--ivory);
+  transform:scaleY(0);transform-origin:bottom;transition:transform .55s var(--ease-io)}
+.footer__cta>*{position:relative;z-index:1}
+.footer__cta-label{font-size:.62rem;font-weight:700;letter-spacing:.26em;text-transform:uppercase;
+  opacity:.7;transition:transform .5s var(--ease)}
+.footer__cta-row{display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+  transition:transform .5s var(--ease)}
+.footer__cta-text{font-size:clamp(1.05rem,1.7vw,1.35rem);font-weight:800;line-height:1.1;
+  letter-spacing:.14em;text-transform:uppercase}
+.footer__cta-arrow{font-size:clamp(1rem,1.4vw,1.2rem);line-height:1;transition:transform .5s var(--ease)}
+.footer__cta:hover::before,.footer__cta:focus-visible::before{transform:scaleY(1)}
+.footer__cta:hover,.footer__cta:focus-visible{color:var(--charcoal);border-color:var(--ivory)}
+.footer__cta:hover .footer__cta-label,.footer__cta:focus-visible .footer__cta-label,
+.footer__cta:hover .footer__cta-row,.footer__cta:focus-visible .footer__cta-row{transform:translateX(4px)}
+.footer__cta:hover .footer__cta-arrow,.footer__cta:focus-visible .footer__cta-arrow{transform:translateY(-4px)}
+.footer__cta:focus-visible{outline:2px solid var(--ivory);outline-offset:4px}
+@media (min-width:860px){.footer__cta{flex:0 0 auto;width:clamp(300px,32vw,460px)}}
+.footer__grid{display:grid;grid-template-columns:1fr;gap:clamp(36px,5vw,56px);
+  padding-block:clamp(50px,8vh,80px);border-top:1px solid var(--line-lt)}
+.footer .brand__name{font-size:1.5rem}
+.footer__blurb{margin-top:18px;max-width:34ch;color:rgba(247,244,237,.66);font-size:.9rem;line-height:1.8}
+.footer__brand{min-width:0}
+.footer__col h3{font-size:.6rem;font-weight:700;letter-spacing:.26em;text-transform:uppercase;
+  color:rgba(247,244,237,.5);margin-bottom:20px;font-weight:700}
+.footer__col ul{display:flex;flex-direction:column;gap:12px}
+.footer__col a,.footer__col p{font-size:.92rem;color:rgba(247,244,237,.86);line-height:1.65}
+.footer__col a{position:relative;display:inline-block;transition:color .3s}
+.footer__col a::after{content:"";position:absolute;left:0;bottom:-2px;width:100%;height:1px;background:currentColor;
+  transform:scaleX(0);transform-origin:right;transition:transform .4s var(--ease-io)}
+.footer__col a:hover,.footer__col a:focus-visible{color:var(--ivory)}
+.footer__col a:hover::after,.footer__col a:focus-visible::after{transform:scaleX(1);transform-origin:left}
+.footer__social{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.footer__social a{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(247,244,237,.22);
+  padding:9px 16px;font-size:.58rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  transition:background-color .4s,color .4s,border-color .4s}
+.footer__social a:hover,.footer__social a:focus-visible{background:var(--ivory);color:var(--charcoal);border-color:var(--ivory)}
+.footer__bottom{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;
+  padding-block:26px;border-top:1px solid var(--line-lt);
+  font-size:.58rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:rgba(247,244,237,.55)}
+.footer__credit{color:rgba(247,244,237,.85)}
+.footer__credit .name{font-family:var(--serif);font-style:italic;text-transform:none;
+  letter-spacing:.06em;font-size:.8rem;border-bottom:1px solid rgba(247,244,237,.4);
+  transition:border-color .3s,color .3s}
+.footer__credit a:hover .name{color:var(--ivory);border-color:var(--ivory)}
+@media (min-width:860px){.footer__grid{grid-template-columns:1.6fr 1fr 1fr 1.3fr}}
+
+/* ---------- PAGE LOADER + TRANSITION VEIL ---------- */
+.pt-loader{position:fixed;inset:0;z-index:500;background:var(--ivory);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.pt-loader__inner{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.pt-loader__mask{display:block;overflow:hidden;padding-bottom:.08em;margin-bottom:-.08em}
+.pt-loader__brand{display:block;font-family:var(--serif);font-weight:400;font-size:clamp(2.2rem,6vw,3.6rem);line-height:1;text-transform:uppercase;letter-spacing:.02em;color:var(--charcoal)}
+.pt-loader__brand--sub{font-family:var(--sans);font-size:.6rem;font-weight:700;letter-spacing:.52em;text-transform:uppercase;color:var(--mut);margin-top:2px}
+.pt-loader__bar{position:relative;display:block;width:min(220px,42vw);height:1px;margin-top:26px;background:rgba(23,23,23,.16);overflow:hidden}
+.pt-loader__bar i{position:absolute;inset:0;background:var(--charcoal);transform:scaleX(0);transform-origin:left;will-change:transform}
+.pt-veil{position:fixed;inset:0;z-index:480;background:var(--ivory);transform:translateY(101%);pointer-events:none;will-change:transform}
+/* ---------- REDUCED MOTION ---------- */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;scroll-behavior:auto !important}
+  .hero__scroll .line::after{animation:none}
+  .ml__i{transform:none !important}
+}
+</style>
+<noscript><style>.pt-loader,.pt-veil{display:none !important}</style></noscript></head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="grain" aria-hidden="true"></div><div class="pt-loader" id="ptLoader" aria-hidden="true"><div class="pt-loader__inner"><span class="pt-loader__mask"><span class="pt-loader__brand">Allegiance</span></span><span class="pt-loader__mask"><span class="pt-loader__brand pt-loader__brand--sub">Academy</span></span><span class="pt-loader__bar"><i></i></span></div></div><div class="pt-veil" id="ptVeil" aria-hidden="true"></div>
+
+<!-- ================= HEADER ================= -->
+<header class="site-header" id="top">
+  <div class="wrap bar">
+    <a class="brand" href="index.html" aria-label="Allegiance Academy — home">
+      <span class="brand__name">Allegiance</span>
+      <span class="brand__sub">Academy</span>
+    </a>
+    <!-- Cross-page links: HOME / ABOUT / CLUBS / HOUSES resolve to existing pages; the rest
+         deep-link into index.html sections and should be updated to their own pages as they are created. -->
+    <nav class="nav" aria-label="Primary">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="clubs.html">Clubs</a></li>
+        <li><a href="houses.html" aria-current="page">Houses</a></li>
+        <li><a href="news.html">News</a></li>
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="admission.html">Admission</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="header-end">
+      <a class="btn btn--solid btn--sm header-cta" href="admission.html">Apply Now</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu">
+        <span class="l"></span><span class="l"></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ================= MOBILE MENU ================= -->
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Site menu">
+  <div class="menu__inner">
+    <a class="btn btn--ivory" href="admission.html#form" style="margin-bottom:32px;align-self:flex-start">Apply Now</a>
+    <ul class="menu__list">
+      <li class="menu__item"><a class="menu__link" href="index.html"><span class="n">01</span>Home</a></li>
+      <li class="menu__item"><a class="menu__link" href="about.html"><span class="n">02</span>About</a></li>
+      <li class="menu__item"><a class="menu__link" href="clubs.html"><span class="n">03</span>Clubs</a></li>
+      <li class="menu__item"><a class="menu__link" href="houses.html" aria-current="page"><span class="n">04</span>Houses</a></li>
+      <li class="menu__item"><a class="menu__link" href="news.html"><span class="n">05</span>News</a></li>
+      <li class="menu__item"><a class="menu__link" href="gallery.html"><span class="n">06</span>Gallery</a></li>
+      <li class="menu__item"><a class="menu__link" href="admission.html"><span class="n">07</span>Admission</a></li>
+      <li class="menu__item"><a class="menu__link" href="contact.html"><span class="n">08</span>Contact</a></li>
+    </ul>
+    <div class="menu__meta">
+      <!-- PLACEHOLDER: replace contact details with real institutional information. -->
+      <div>
+        <span class="label">Admissions</span>
+        <p><a href="admission.html">Apply to Allegiance →</a></p>
+        <p>Session 2027–28 applications open soon.</p>
+      </div>
+      <div>
+        <span class="label">Contact</span>
+        <p><a href="mailto:admissions@allegianceacademy.in">admissions@allegianceacademy.in</a><br>
+        <a href="tel:+910000000000">+91 00000 00000</a></p>
+      </div>
+      <div>
+        <span class="label">Follow</span>
+        <div class="menu__social">
+          <a href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Allegiance Academy on Instagram">IG</a>
+          <a href="https://www.facebook.com/" target="_blank" rel="noopener" aria-label="Allegiance Academy on Facebook">FB</a>
+          <a href="https://www.youtube.com/" target="_blank" rel="noopener" aria-label="Allegiance Academy on YouTube">YT</a>
+          <a href="https://www.linkedin.com/" target="_blank" rel="noopener" aria-label="Allegiance Academy on LinkedIn">LN</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="hero-houses" aria-label="The four houses of Allegiance Academy">
+  <div class="wrap hero__content">
+    <div class="palette hero__palette" aria-hidden="true">
+      <i style="background:#D64545"></i><i style="background:#E7C52F"></i><i style="background:#4C9A68"></i><i style="background:#4D82C4"></i>
+    </div>
+    <p class="hero__label">The Houses</p>
+    <h1 class="hero__title">
+      <span class="ml"><span class="ml__i">Four Houses.</span></span>
+      <span class="ml"><span class="ml__i"><em>One Spirit.</em></span></span>
+    </h1>
+    <div class="hero__low">
+      <p class="hero__text">Competition creates energy. Community creates belonging.</p>
+    </div>
+  </div>
+  <div class="hero__scroll" aria-hidden="true"><span class="line"></span><span>Scroll</span></div>
+</section>
+
+<!-- ================= HOUSE EXPERIENCE ================= -->
+<div class="hx" id="experience">
+
+  <!-- 01 / RAMAN -->
+  <article class="hx__house hx__house--a" id="house-raman" style="--hc:#D64545" data-bg="#241417" aria-labelledby="raman-title">
+    <div class="wrap hx__grid">
+      <div class="hx__text">
+        <p class="hx__kicker" data-reveal><span class="no">01 /</span> Raman · The House of Inquiry</p>
+        <h2 class="hx__title masklines" id="raman-title"><span class="ml"><span class="ml__i">Raman</span></span></h2>
+        <p class="hx__desc" data-reveal>Named for the physicist C.V. Raman, Raman House treats curiosity as a discipline. Its corridors argue, test and measure — and its members are the first to admit when an experiment fails, because that is where the next one starts.</p>
+        <div class="hx__spirit" data-reveal>
+          <span class="hx__spiritlabel">House spirit</span>
+          <p>“Question everything.”</p>
+        </div>
+        <!-- PLACEHOLDER: honours listed below are illustrative — replace with real house records. -->
+        <div class="hx__honours" data-reveal>
+          <p class="hx__honourslabel">Recent honours — placeholder</p>
+          <ul>
+            <li><span>House Championship</span><span class="yr">2025–26</span></li>
+            <li><span>Inter-house Science Fair</span><span class="yr">2025</span></li>
+            <li><span>Debate Cup</span><span class="yr">2024</span></li>
+          </ul>
+        </div>
+      </div>
+      <figure class="hx__media" data-reveal>
+        <div class="frame hx__frame">
+          <img class="hx__img" src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=1400&auto=format&fit=crop"
+               alt="Laboratory glassware in the Raman House science wing" loading="lazy">
+        </div>
+        <figcaption class="hx__chip"><i aria-hidden="true"></i>#D64545</figcaption>
+      </figure>
+    </div>
+  </article>
+
+  <!-- 02 / SHUBHAS -->
+  <article class="hx__house hx__house--b" id="house-shubhas" style="--hc:#E7C52F" data-bg="#262012" aria-labelledby="shubhas-title">
+    <div class="wrap hx__grid">
+      <div class="hx__text">
+        <p class="hx__kicker" data-reveal><span class="no">02 /</span> Shubhas · The House of Valour</p>
+        <h2 class="hx__title masklines" id="shubhas-title"><span class="ml"><span class="ml__i">Shubhas</span></span></h2>
+        <p class="hx__desc" data-reveal>Inspired by Netaji Subhas Chandra Bose, Shubhas House stands for discipline, daring and an unshakeable will to lead from the front. On the field, on stage and in assembly, Shubhas arrives first and leaves last.</p>
+        <div class="hx__spirit" data-reveal>
+          <span class="hx__spiritlabel">House spirit</span>
+          <p>“Lead from the front.”</p>
+        </div>
+        <!-- PLACEHOLDER: honours listed below are illustrative — replace with real house records. -->
+        <div class="hx__honours" data-reveal>
+          <p class="hx__honourslabel">Recent honours — placeholder</p>
+          <ul>
+            <li><span>Inter-house Athletics Shield</span><span class="yr">2025–26</span></li>
+            <li><span>Best Marching Contingent</span><span class="yr">2025</span></li>
+            <li><span>Football League</span><span class="yr">2024</span></li>
+          </ul>
+        </div>
+      </div>
+      <figure class="hx__media" data-reveal>
+        <div class="frame hx__frame">
+          <img class="hx__img" src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=1400&auto=format&fit=crop"
+               alt="Athletes at the starting line in Shubhas House gold" loading="lazy">
+        </div>
+        <figcaption class="hx__chip"><i aria-hidden="true"></i>#E7C52F</figcaption>
+      </figure>
+    </div>
+  </article>
+
+  <!-- 03 / GANDHI -->
+  <article class="hx__house hx__house--a" id="house-gandhi" style="--hc:#4C9A68" data-bg="#12211A" aria-labelledby="gandhi-title">
+    <div class="wrap hx__grid">
+      <div class="hx__text">
+        <p class="hx__kicker" data-reveal><span class="no">03 /</span> Gandhi · The House of Service</p>
+        <h2 class="hx__title masklines" id="gandhi-title"><span class="ml"><span class="ml__i">Gandhi</span></span></h2>
+        <p class="hx__desc" data-reveal>Carrying Gandhi's belief in truth and quiet strength, Gandhi House leads through empathy, sustainability and service. Its members plant more than they post — and measure a good year by what the community around the school gained.</p>
+        <div class="hx__spirit" data-reveal>
+          <span class="hx__spiritlabel">House spirit</span>
+          <p>“Serve before you speak.”</p>
+        </div>
+        <!-- PLACEHOLDER: honours listed below are illustrative — replace with real house records. -->
+        <div class="hx__honours" data-reveal>
+          <p class="hx__honourslabel">Recent honours — placeholder</p>
+          <ul>
+            <li><span>Sustainability Drive</span><span class="yr">2025–26</span></li>
+            <li><span>Community Outreach Cup</span><span class="yr">2025</span></li>
+            <li><span>Quiz League</span><span class="yr">2024</span></li>
+          </ul>
+        </div>
+      </div>
+      <figure class="hx__media" data-reveal>
+        <div class="frame hx__frame">
+          <img class="hx__img" src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1400&auto=format&fit=crop"
+               alt="Sunlight through the green canopy of the Gandhi House arboretum" loading="lazy">
+        </div>
+        <figcaption class="hx__chip"><i aria-hidden="true"></i>#4C9A68</figcaption>
+      </figure>
+    </div>
+  </article>
+
+  <!-- 04 / TAGORE -->
+  <article class="hx__house hx__house--b" id="house-tagore" style="--hc:#4D82C4" data-bg="#121B26" aria-labelledby="tagore-title">
+    <div class="wrap hx__grid">
+      <div class="hx__text">
+        <p class="hx__kicker" data-reveal><span class="no">04 /</span> Tagore · The House of Imagination</p>
+        <h2 class="hx__title masklines" id="tagore-title"><span class="ml"><span class="ml__i">Tagore</span></span></h2>
+        <p class="hx__desc" data-reveal>In Rabindranath Tagore's spirit, Tagore House gives shape to ideas — through verse, canvas, stage and song. It is the house most likely to be rehearsing at dusk and exhibiting by morning.</p>
+        <div class="hx__spirit" data-reveal>
+          <span class="hx__spiritlabel">House spirit</span>
+          <p>“Make it beautiful.”</p>
+        </div>
+        <!-- PLACEHOLDER: honours listed below are illustrative — replace with real house records. -->
+        <div class="hx__honours" data-reveal>
+          <p class="hx__honourslabel">Recent honours — placeholder</p>
+          <ul>
+            <li><span>Best Production, Annual Play</span><span class="yr">2025–26</span></li>
+            <li><span>Choir of the Year</span><span class="yr">2025</span></li>
+            <li><span>Art Exhibition Choice Prize</span><span class="yr">2024</span></li>
+          </ul>
+        </div>
+      </div>
+      <figure class="hx__media" data-reveal>
+        <div class="frame hx__frame">
+          <img class="hx__img" src="https://images.unsplash.com/photo-1507838153414-b4b713384a76?q=80&w=1400&auto=format&fit=crop"
+               alt="Sheet music on the stand in the Tagore House music room" loading="lazy">
+        </div>
+        <figcaption class="hx__chip"><i aria-hidden="true"></i>#4D82C4</figcaption>
+      </figure>
+    </div>
+  </article>
+</div>
+
+<!-- ================= HOUSE LIFE ================= -->
+<section class="section hlife" id="house-life" aria-labelledby="hlife-title">
+  <div class="wrap">
+    <div class="sec-head sec-head--split">
+      <div>
+        <p class="label" data-reveal><span class="no">02</span> — House Life</p>
+        <h2 class="display sec-title" id="hlife-title" data-reveal>A year in <em>house colours.</em></h2>
+      </div>
+      <p class="sec-intro" data-reveal>Fixtures, festivals, quizzes and councils — the house calendar runs through every term, and every member has a place in it.</p>
+    </div>
+    <!-- PLACEHOLDER: replace photographs with the school's own house photography. -->
+    <div class="hlife__grid">
+      <figure class="hlife__item hlife__item--sports" data-reveal>
+        <div class="frame a-45 hlife__frame">
+          <img src="https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=1000&auto=format&fit=crop" alt="Cyclists mid-race at the inter-house athletics meet" loading="lazy">
+        </div>
+        <figcaption class="hlife__cap"><span class="no">01</span><span>Sports competitions</span></figcaption>
+      </figure>
+      <figure class="hlife__item hlife__item--cultural" data-reveal>
+        <div class="frame a-43 hlife__frame">
+          <img src="https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?q=80&w=1200&auto=format&fit=crop" alt="Stage lights above the inter-house cultural evening" loading="lazy">
+        </div>
+        <figcaption class="hlife__cap"><span class="no">02</span><span>Cultural events</span></figcaption>
+      </figure>
+      <figure class="hlife__item hlife__item--wide hlife__item--academic" data-reveal>
+        <div class="frame a-1610 hlife__frame">
+          <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=1600&auto=format&fit=crop" alt="Open books during the inter-house quiz final" loading="lazy">
+        </div>
+        <figcaption class="hlife__cap"><span class="no">03</span><span>Academic competitions</span></figcaption>
+      </figure>
+      <figure class="hlife__item hlife__item--leadership" data-reveal>
+        <div class="frame a-34 hlife__frame">
+          <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1000&auto=format&fit=crop" alt="House captains planning the term's fixtures" loading="lazy">
+        </div>
+        <figcaption class="hlife__cap"><span class="no">04</span><span>Leadership</span></figcaption>
+      </figure>
+      <figure class="hlife__item hlife__item--wide hlife__item--teamwork" data-reveal>
+        <div class="frame a-169 hlife__frame">
+          <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=1600&auto=format&fit=crop" alt="House members together after the final assembly of the year" loading="lazy">
+        </div>
+        <figcaption class="hlife__cap"><span class="no">05</span><span>Teamwork</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HOUSE SPIRIT ================= -->
+<section class="section spirit" id="house-spirit" aria-labelledby="spirit-title">
+  <div class="wrap spirit__inner">
+    <div class="palette palette--spirit" aria-hidden="true">
+      <i style="background:#D64545"></i><i style="background:#E7C52F"></i><i style="background:#4C9A68"></i><i style="background:#4D82C4"></i>
+    </div>
+    <p class="label" data-reveal><span class="no">03</span> — House Spirit</p>
+    <h2 class="spirit__statement masklines" id="spirit-title">
+      <span class="ml"><span class="ml__i">Compete with pride.</span></span>
+      <span class="ml"><span class="ml__i"><em>Belong with purpose.</em></span></span>
+    </h2>
+    <p class="spirit__text" data-reveal>Four houses, one school. The rivalry is real — and so is the friendship underneath it. Points are counted all year; belonging never is.</p>
+  </div>
+</section>
+
+<!-- ================= CLOSING ================= -->
+<section class="section close" id="closing" aria-labelledby="closing-title">
+  <div class="wrap close__inner">
+    <p class="label" data-reveal><span class="no">04</span> — Take the next step</p>
+    <h2 class="display closing__head" id="closing-title" data-reveal>Every student joins a house on day one. <em>The house keeps them for life.</em></h2>
+    <p class="close__text" data-reveal>Want to see the houses mid-season — on the field, on stage, and in the corridors between bells?</p>
+    <div data-reveal>
+      <a class="btn btn--solid" href="clubs.html">Discover Student Life
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
+      <a class="textlink" href="news.html">See the Latest Stories
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer theme-dark" id="contact">
+  <div class="wrap">
+    <div class="footer__top">
+      <div class="footer__staterow">
+        <p class="footer__statement masklines">
+          <span class="ml"><span class="ml__i">Where curiosity</span></span>
+          <span class="ml"><span class="ml__i"><em>becomes character.</em></span></span>
+        </p>
+        <a class="footer__cta" href="admission.html">
+          <span class="footer__cta-label">Ready to begin?</span>
+          <span class="footer__cta-row">
+            <span class="footer__cta-text">Apply now</span>
+            <span class="footer__cta-arrow" aria-hidden="true">&#8599;</span>
+          </span>
+        </a>
+      </div>
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <a class="brand" href="index.html" aria-label="Allegiance Academy — home">
+            <span class="brand__name">Allegiance</span>
+            <span class="brand__sub">Academy</span>
+          </a>
+          <p class="footer__blurb">A community of learners where curiosity, creativity, confidence and character grow together.</p>
+          <div class="footer__social">
+            <!-- PLACEHOLDER: point these to the school's real social profiles. -->
+            <a href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Allegiance Academy on Instagram">Instagram</a>
+            <a href="https://www.facebook.com/" target="_blank" rel="noopener" aria-label="Allegiance Academy on Facebook">Facebook</a>
+            <a href="https://www.youtube.com/" target="_blank" rel="noopener" aria-label="Allegiance Academy on YouTube">YouTube</a>
+            <a href="https://www.linkedin.com/" target="_blank" rel="noopener" aria-label="Allegiance Academy on LinkedIn">LinkedIn</a>
+          </div>
+        </div>
+        <nav class="footer__col" aria-label="Footer — explore">
+          <h3>Explore</h3>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="clubs.html">Clubs</a></li>
+            <li><a href="houses.html">Houses</a></li>
+            <li><a href="news.html">News</a></li>
+            <li><a href="gallery.html">Gallery</a></li>
+          </ul>
+        </nav>
+        <nav class="footer__col" aria-label="Footer — admissions">
+          <h3>Admissions</h3>
+          <ul>
+            <li><a href="admission.html">Admissions overview</a></li>
+            <li><a href="admission.html#form">Apply now</a></li>
+            <li><a href="admission.html#visit">Visit the campus</a></li>
+          </ul>
+        </nav>
+        <div class="footer__col">
+          <h3>Contact</h3>
+          <!-- PLACEHOLDER: replace with the school's real address and contact details. -->
+          <ul>
+            <li><p>Allegiance Academy Campus,<br>Education City Road, Your City</p></li>
+            <li><a href="mailto:admissions@allegianceacademy.in">admissions@allegianceacademy.in</a></li>
+            <li><a href="tel:+910000000000">+91 00000 00000</a></li>
+            <li><p>Mon–Sat · 08:30–16:30 IST</p></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <p>© <span id="year">2026</span> Allegiance Academy — All rights reserved</p>
+      <p class="footer__credit">Crafted by <a href="index.html"><span class="name">Gourav</span></a></p>
+    </div>
+  </div>
+</footer>
+
+</main>
+
+<!-- ================= SCRIPTS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* Fail-safe: hide the loader even if later initialization throws. */
+  window.setTimeout(function () {
+    var _pl = document.getElementById('ptLoader');
+    if (_pl) { _pl.hidden = true; _pl.style.display = 'none'; }
+  }, 2600);
+
+  var doc = document;
+  var root = doc.documentElement;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hasGsap = typeof window.gsap !== 'undefined';
+  var hasST = hasGsap && typeof window.ScrollTrigger !== 'undefined';
+  if (hasST) { gsap.registerPlugin(ScrollTrigger); }
+
+  /* ---------- Footer year ---------- */
+  var yearEl = doc.getElementById('year');
+  if (yearEl) { yearEl.textContent = String(new Date().getFullYear()); }
+
+  /* ---------- Smooth scrolling (Lenis) ---------- */
+  var lenis = null;
+  if (!reduce && typeof window.Lenis !== 'undefined' && hasGsap) {
+    lenis = new Lenis({
+      duration: 1.15,
+      easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
+      smoothWheel: true
+    });
+    if (hasST) { lenis.on('scroll', ScrollTrigger.update); }
+    gsap.ticker.add(function (time) { lenis.raf(time * 1000); });
+    gsap.ticker.lagSmoothing(0);
+  }
+
+  /* ---------- Header scroll state ---------- */
+  var header = doc.querySelector('.site-header');
+  var headerShrunk = false;
+  function updateHeader(y) {
+    var s = y > 32;
+    if (s !== headerShrunk && header) {
+      headerShrunk = s;
+      header.classList.toggle('is-scrolled', s);
+    }
+  }
+  if (lenis) {
+    lenis.on('scroll', function (e) { updateHeader(e.scroll || 0); });
+  } else {
+    window.addEventListener('scroll', function () {
+      updateHeader(window.scrollY || window.pageYOffset || 0);
+    }, { passive: true });
+  }
+  updateHeader(window.scrollY || 0);
+
+  /* ---------- Mobile menu ---------- */
+  var toggle = doc.querySelector('.nav-toggle');
+  var menu = doc.getElementById('menu');
+  var menuOpen = false;
+  function setMenu(open) {
+    if (!menu || !toggle) { return; }
+    menuOpen = open;
+    menu.classList.toggle('is-open', open);
+    root.classList.toggle('menu-open', open);
+    root.classList.toggle('menu-locked', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    if (lenis) { if (open) { lenis.stop(); } else { lenis.start(); } }
+    if (open) {
+      var first = menu.querySelector('a, button');
+      if (first) { first.focus({ preventScroll: true }); }
+    }
+  }
+  if (toggle && menu) {
+    toggle.addEventListener('click', function () { setMenu(!menuOpen); });
+    doc.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && menuOpen) { setMenu(false); toggle.focus({ preventScroll: true }); }
+    });
+    window.addEventListener('resize', function () {
+      if (menuOpen && window.innerWidth > 1080) { setMenu(false); }
+    });
+    menu.addEventListener('click', function (e) {
+      if (e.target.closest('a')) { setMenu(false); }
+    });
+  }
+
+  /* ---------- Same-page anchor navigation ---------- */
+  var HEADER_OFFSET = 76;
+  Array.prototype.slice.call(doc.querySelectorAll('a[href^="#"]')).forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var id = a.getAttribute('href');
+      if (!id || id === '#') { e.preventDefault(); return; }
+      var target = doc.querySelector(id);
+      if (!target) { return; }
+      e.preventDefault();
+      if (menuOpen) { setMenu(false); }
+      if (lenis) {
+        lenis.scrollTo(target, { offset: -HEADER_OFFSET, duration: 1.4 });
+      } else {
+        target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  /* ---------- Unified shell: active nav · loader · page transitions ---------- */
+  (function () {
+    var page = (window.location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    Array.prototype.forEach.call(doc.querySelectorAll('.nav a[href], .menu__link'), function (l) {
+      var href = l.getAttribute('href') || '';
+      var target = href.split('#')[0].toLowerCase();
+      if (!target) { return; }
+      if (target === page) {
+        l.setAttribute('aria-current', 'page');
+        l.classList.add('is-active');
+      } else {
+        l.removeAttribute('aria-current');
+        l.classList.remove('is-active');
+      }
+    });
+  })();
+
+  var ptLoader = doc.getElementById('ptLoader');
+  var ptVeil = doc.getElementById('ptVeil');
+  var ptBusy = false;
+
+  function ptHideLoader() {
+    if (ptLoader && !ptLoader.hidden) {
+      ptLoader.hidden = true;
+      ptLoader.style.display = 'none';
+    }
+  }
+  window.setTimeout(ptHideLoader, 2600); /* safety net */
+
+  function ptRunIntro() {
+    if (!ptLoader) { return; }
+    if (hasGsap && !reduce) {
+      gsap.timeline()
+        .from('.pt-loader__brand', { yPercent: 120, duration: 0.7, ease: 'power4.out', stagger: 0.08 })
+        .to('.pt-loader__bar i', { scaleX: 1, duration: 0.6, ease: 'power2.inOut' }, '-=0.35')
+        .to(ptLoader, { yPercent: -100, duration: 0.75, ease: 'power4.inOut', delay: 0.1 })
+        .set(ptLoader, { display: 'none' });
+    } else {
+      ptHideLoader();
+    }
+  }
+  ptRunIntro();
+
+  function ptGo(href) {
+    if (reduce || !hasGsap || !ptVeil || ptBusy) { window.location.href = href; return; }
+    ptBusy = true;
+    gsap.timeline()
+      .set(ptVeil, { yPercent: 101 })
+      .to(ptVeil, { yPercent: 0, duration: 0.55, ease: 'power4.inOut',
+        onComplete: function () { window.location.href = href; } });
+  }
+
+  doc.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button !== 0) { return; }
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) { return; }
+    var link = e.target.closest ? e.target.closest('a[href]') : null;
+    if (!link) { return; }
+    if (link.target && link.target !== '_self') { return; }
+    if (link.hasAttribute('download')) { return; }
+    var href = link.getAttribute('href') || '';
+    if (!href || href.charAt(0) === '#') { return; }
+    if (/^(mailto:|tel:|javascript:)/i.test(href)) { return; }
+    var url;
+    try { url = new URL(href, window.location.href); } catch (err) { return; }
+    if (url.origin !== window.location.origin) { return; }
+    if (url.pathname.replace(/\/+$/, '') === window.location.pathname.replace(/\/+$/, '')) { return; }
+    e.preventDefault();
+    ptGo(url.href);
+  });
+
+  window.addEventListener('pageshow', function (e) {
+    if (e.persisted) {
+      ptBusy = false;
+      if (ptVeil && hasGsap) { gsap.set(ptVeil, { yPercent: 101 }); }
+      ptHideLoader();
+      if (lenis) { lenis.start(); }
+    }
+  });
+
+  /* ---------- Motion (skipped entirely for reduced-motion users) ---------- */
+  if (hasST && !reduce) {
+
+    /* Hero: palette bar draws in, content staggers */
+    gsap.timeline({ delay: 1.5, defaults: { ease: 'power3.out' } })
+      .from('.hero__palette i', { scaleX: 0, duration: 0.8, ease: 'power4.inOut', stagger: 0.12 }, 0.1)
+      .from('.hero__label', { y: 26, autoAlpha: 0, duration: 0.9 }, 0.5)
+      .from('.hero__title .ml__i', { yPercent: 112, duration: 1.1, ease: 'power4.out', stagger: 0.12 }, 0.65)
+      .from('.hero__text', { y: 24, autoAlpha: 0, duration: 0.9 }, 1.05)
+      .from('.hero__scroll', { autoAlpha: 0, duration: 0.8 }, 1.6);
+
+    /* Generic scroll-in reveals */
+    Array.prototype.slice.call(doc.querySelectorAll('[data-reveal]')).forEach(function (el) {
+      gsap.from(el, {
+        y: 34, autoAlpha: 0, duration: 1, ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 88%' }
+      });
+    });
+
+    /* Masked display headings (house titles / spirit statement / footer statement) */
+    Array.prototype.slice.call(doc.querySelectorAll('.masklines')).forEach(function (h) {
+      var lines = h.querySelectorAll('.ml__i');
+      if (!lines.length) { return; }
+      gsap.from(lines, {
+        yPercent: 112, duration: 1.05, ease: 'power4.out', stagger: 0.1,
+        scrollTrigger: { trigger: h, start: 'top 85%' }
+      });
+    });
+
+    /* House experience: canvas tint follows the active house (text stays readable) */
+    var hx = doc.querySelector('.hx');
+    var houses = Array.prototype.slice.call(doc.querySelectorAll('.hx__house'));
+    houses.forEach(function (house) {
+      ScrollTrigger.create({
+        trigger: house,
+        start: 'top 55%',
+        end: 'bottom 55%',
+        onToggle: function (self) {
+          if (self.isActive && hx) {
+            hx.style.backgroundColor = house.getAttribute('data-bg') || '#171717';
+          }
+        }
+      });
+    });
+
+    /* House experience: image settles from a slight zoom as the section enters */
+    houses.forEach(function (house) {
+      var img = house.querySelector('.hx__img');
+      if (!img) { return; }
+      gsap.fromTo(img, { scale: 1.18 }, {
+        scale: 1, ease: 'none',
+        scrollTrigger: { trigger: house, start: 'top 80%', end: 'top 15%', scrub: true }
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>
