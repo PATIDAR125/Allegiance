@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>News — Allegiance Academy | What's Happening</title>
+<meta name="description" content="Stories, achievements and moments from Allegiance Academy.">
+<meta name="theme-color" content="#171717">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23171717'/%3E%3Ctext x='32' y='45' font-family='Georgia,serif' font-size='36' fill='%23F7F4ED' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   ALLEGIANCE ACADEMY — NEWS & ANNOUNCEMENTS
+   Single-file build · GSAP + ScrollTrigger + Lenis
+   ============================================================ */
+
+/* ---------- TOKENS ---------- */
+:root{
+  --ivory:#F7F4ED;
+  --charcoal:#171717;
+  --beige:#E9E4D8;
+  --white:#FFFFFF;
+  --ink-2:#121110;
+  --raman:#D64545;
+  --shubhas:#E7C52F;
+  --gandhi:#4C9A68;
+  --tagore:#4D82C4;
+  --line:rgba(23,23,23,.14);
+  --line-lt:rgba(247,244,237,.16);
+  --mut:rgba(23,23,23,.62);
+  --mut-lt:rgba(247,244,237,.72);
+  --serif:'DM Serif Display',Georgia,'Times New Roman',serif;
+  --sans:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --pad:clamp(20px,4.4vw,72px);
+  --ease:cubic-bezier(.22,1,.36,1);
+  --ease-io:cubic-bezier(.65,0,.35,1);
+}
+
+/* ---------- RESET / BASE ---------- */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:auto;-webkit-text-size-adjust:100%}
+html,body{overflow-x:clip}
+html.menu-locked,html.menu-locked body{overflow:hidden}
+body{
+  background:var(--ivory);color:var(--charcoal);
+  font-family:var(--sans);font-size:16px;line-height:1.65;font-weight:400;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit;text-decoration:none}
+ul,ol{list-style:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+figure{margin:0}
+::selection{background:var(--charcoal);color:var(--ivory)}
+:focus-visible{outline:2px solid currentColor;outline-offset:4px}
+[id]{scroll-margin-top:90px}
+.ico{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+.skip{position:fixed;top:-70px;left:16px;z-index:400;background:var(--charcoal);color:var(--ivory);
+  padding:12px 20px;font-size:.7rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;transition:top .3s ease}
+.skip:focus{top:16px}
+
+/* film grain overlay */
+.grain{position:fixed;inset:0;z-index:95;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.7'/%3E%3C/svg%3E");
+  background-size:240px 240px}
+
+/* ---------- TYPE / UTILITIES ---------- */
+.wrap{width:100%;max-width:1680px;margin-inline:auto;padding-inline:var(--pad)}
+.section{position:relative;padding-block:clamp(90px,13vh,170px)}
+.label{font-size:.66rem;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--mut)}
+.theme-dark .label{color:var(--mut-lt)}
+.display{font-family:var(--serif);font-weight:400;line-height:1.05;letter-spacing:-.01em}
+.display em{font-style:italic}
+.sec-head{display:flex;flex-direction:column;gap:22px;margin-bottom:clamp(48px,8vh,96px)}
+.sec-head .label{display:flex;align-items:center;gap:14px}
+.sec-head .label .no{color:var(--charcoal)}
+.theme-dark .sec-head .label .no{color:var(--ivory)}
+.sec-head .label::after{content:"";height:1px;width:56px;background:currentColor;opacity:.35}
+.sec-title{font-size:clamp(2.1rem,5.2vw,4.4rem);max-width:18ch}
+.sec-intro{max-width:38ch;color:var(--mut);line-height:1.85;font-size:.95rem}
+.ml{display:block;overflow:hidden;padding-bottom:.07em;margin-bottom:-.07em}
+.ml__i{display:block;will-change:transform}
+.masklines .ml__i{will-change:transform}
+
+/* meta row (date · category) with tinted category dot */
+.meta{display:flex;align-items:center;flex-wrap:wrap;gap:12px;
+  font-size:.6rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--mut)}
+.meta .dot{width:5px;height:5px;border-radius:50%;background:var(--charcoal);flex:none}
+.news-item[data-cat="sports"] .dot,.dot--sports{background:var(--raman)}
+.news-item[data-cat="culture"] .dot,.dot--culture{background:var(--shubhas)}
+.news-item[data-cat="events"] .dot,.dot--events{background:var(--gandhi)}
+.news-item[data-cat="academic"] .dot,.dot--academic{background:var(--tagore)}
+.news-item[data-cat="achievements"] .dot,.dot--achievements{background:var(--charcoal)}
+.news-item[data-cat="announcements"] .dot,.dot--announcements{background:#8A8272}
+.theme-dark .meta{color:var(--mut-lt)}
+.theme-dark .meta .dot{background:var(--ivory)}
+.label--flat{display:flex;align-items:center;gap:14px;margin-bottom:clamp(30px,5vh,50px)}
+.label--flat .no{color:var(--charcoal)}
+
+/* aspect-ratio helpers */
+.a-34{aspect-ratio:3/4}.a-45{aspect-ratio:4/5}.a-11{aspect-ratio:1/1}
+.a-43{aspect-ratio:4/3}.a-1610{aspect-ratio:16/10}.a-219{aspect-ratio:21/9}
+.frame{position:relative;overflow:hidden;background:var(--beige)}
+.frame img{width:100%;height:100%;object-fit:cover}
+.img-plx{position:absolute;left:0;top:-9%;width:100%;height:118%;object-fit:cover;will-change:transform}
+.framecap{display:flex;justify-content:space-between;gap:16px;margin-top:14px;
+  font-size:.6rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--mut)}
+
+/* ---------- BUTTONS ---------- */
+.btn{position:relative;display:inline-flex;align-items:center;gap:12px;
+  padding:1.1em 1.7em;border:1px solid currentColor;
+  font-size:.7rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
+  color:inherit;background:transparent;overflow:hidden;cursor:pointer;
+  transition:color .45s var(--ease)}
+.btn>*{position:relative;z-index:1}
+.btn::before{content:"";position:absolute;inset:0;z-index:0;background:var(--fill,var(--charcoal));
+  transform:scaleY(0);transform-origin:bottom;transition:transform .55s var(--ease-io)}
+.btn:hover::before,.btn:focus-visible::before{transform:scaleY(1)}
+.btn:hover,.btn:focus-visible{color:var(--fillink,var(--ivory))}
+.btn .ico{width:15px;height:15px;flex:none;transition:transform .45s var(--ease)}
+.btn:hover .ico,.btn:focus-visible .ico{transform:translateX(5px)}
+.btn--solid{background:var(--charcoal);border-color:var(--charcoal);color:var(--ivory);
+  --fill:var(--ivory);--fillink:var(--charcoal)}
+.btn--light{color:var(--ivory);--fill:var(--ivory);--fillink:var(--charcoal)}
+.btn--ivory{background:var(--ivory);border-color:var(--ivory);color:var(--charcoal);
+  --fill:var(--charcoal);--fillink:var(--ivory)}
+.btn--sm{padding:.85em 1.35em;font-size:.64rem}
+.textlink{position:relative;display:inline-flex;align-items:center;gap:10px;
+  font-size:.68rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;padding-bottom:6px}
+.textlink::after{content:"";position:absolute;left:0;bottom:0;height:1px;width:100%;background:currentColor;
+  transform:scaleX(0);transform-origin:right;transition:transform .5s var(--ease-io)}
+.textlink:hover::after,.textlink:focus-visible::after{transform:scaleX(1);transform-origin:left}
+.textlink .ico{width:14px;height:14px;transition:transform .45s var(--ease)}
+.textlink:hover .ico,.textlink:focus-visible .ico{transform:translateX(4px)}
+
+/* ---------- HEADER ---------- */
+.site-header{position:fixed;top:0;left:0;right:0;z-index:300;
+  --ink:var(--ivory);color:var(--ink);
+  background:transparent;border-bottom:1px solid transparent;
+  transition:background-color .5s var(--ease),border-color .5s var(--ease),color .5s var(--ease)}
+.site-header .bar{display:flex;align-items:center;justify-content:space-between;gap:28px;
+  height:92px;transition:height .5s var(--ease)}
+.site-header.is-scrolled{--ink:var(--charcoal);background:rgba(247,244,237,.94);
+  border-bottom-color:var(--line);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.site-header.is-scrolled .bar{height:66px}
+.brand{display:flex;flex-direction:column;gap:3px;line-height:1}
+.brand__name{font-family:var(--serif);font-size:1.22rem;letter-spacing:.04em;text-transform:uppercase}
+.brand__sub{font-size:.5rem;font-weight:700;letter-spacing:.52em;text-transform:uppercase;opacity:.8}
+.header-end{display:flex;align-items:center;gap:16px}
+.nav{display:none}
+.header-cta{display:none}
+.nav ul{display:flex;align-items:center;gap:clamp(18px,1.9vw,32px)}
+.nav a{position:relative;display:inline-block;padding:8px 0;
+  font-size:.66rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  opacity:.82;transition:opacity .3s ease}
+.nav a::after{content:"";position:absolute;left:0;bottom:2px;width:100%;height:1px;background:currentColor;
+  transform:scaleX(0);transform-origin:right;transition:transform .45s var(--ease-io)}
+.nav a:hover,.nav a:focus-visible{opacity:1}
+.nav a:hover::after,.nav a:focus-visible::after,
+.nav a[aria-current="page"]::after,.nav a[aria-current="true"]::after{transform:scaleX(1);transform-origin:left}
+.nav a[aria-current="page"]{opacity:1}
+@media (min-width:1081px){
+  .nav{display:block}
+  .header-cta{display:inline-flex}
+}
+.nav-toggle{position:relative;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;
+  gap:7px;width:46px;height:46px;margin-right:-8px;padding:8px}
+.nav-toggle .l{display:block;height:2px;width:26px;background:var(--ink);
+  transition:transform .45s var(--ease),width .3s ease,background-color .4s ease}
+.nav-toggle .l:nth-child(2){width:17px}
+@media (min-width:1081px){.nav-toggle{display:none}}
+
+/* ---------- MOBILE MENU (full-screen) ---------- */
+.menu{position:fixed;inset:0;z-index:200;background:var(--charcoal);color:var(--ivory);
+  clip-path:inset(0 0 100% 0);visibility:hidden;overflow-y:auto;overscroll-behavior:contain;
+  transition:clip-path .75s var(--ease-io),visibility 0s linear .75s}
+.menu.is-open{clip-path:inset(0 0 0 0);visibility:visible;
+  transition:clip-path .75s var(--ease-io),visibility 0s linear 0s}
+html.menu-open .site-header{--ink:var(--ivory);background:transparent;border-bottom-color:transparent;backdrop-filter:none;-webkit-backdrop-filter:none}
+html.menu-open .nav-toggle .l{background:var(--ivory)}
+html.menu-open .nav-toggle .l:nth-child(1){width:26px;transform:translateY(4.5px) rotate(45deg)}
+html.menu-open .nav-toggle .l:nth-child(2){width:26px;transform:translateY(-4.5px) rotate(-45deg)}
+.menu__inner{min-height:100%;display:flex;flex-direction:column;justify-content:flex-end;
+  padding:120px var(--pad) 6vh}
+.menu__list{margin-bottom:clamp(30px,6vh,60px)}
+.menu__item{--d:0s}
+.menu__item:nth-child(1){--d:.26s}.menu__item:nth-child(2){--d:.30s}
+.menu__item:nth-child(3){--d:.34s}.menu__item:nth-child(4){--d:.38s}
+.menu__item:nth-child(5){--d:.42s}.menu__item:nth-child(6){--d:.46s}
+.menu__item:nth-child(7){--d:.50s}.menu__item:nth-child(8){--d:.54s}
+.menu__link{display:inline-flex;align-items:baseline;gap:16px;padding:6px 0;
+  font-family:var(--serif);font-size:clamp(1.85rem,6.5vw,3.2rem);line-height:1.12;
+  text-transform:uppercase;letter-spacing:.01em;
+  transform:translateY(115%);
+  transition:transform .75s var(--ease) var(--d),color .3s ease 0s}
+.menu__link .n{font-family:var(--sans);font-size:.62rem;font-weight:700;letter-spacing:.24em;opacity:.5}
+.menu__link:hover,.menu__link:focus-visible{color:var(--beige)}
+.menu__link[aria-current="page"]{color:var(--beige)}
+.menu.is-open .menu__link{transform:translateY(0)}
+.menu__meta{border-top:1px solid var(--line-lt);padding-top:30px;display:grid;gap:28px;grid-template-columns:1fr;
+  opacity:0;transform:translateY(16px);
+  transition:opacity .6s ease .62s,transform .7s var(--ease) .62s}
+.menu.is-open .menu__meta{opacity:1;transform:translateY(0)}
+.menu__meta .label{display:block;margin-bottom:10px;color:var(--mut-lt)}
+.menu__meta p{font-size:.86rem;line-height:1.75}
+.menu__meta a{transition:color .3s}
+.menu__meta a:hover{color:var(--beige)}
+.menu__social{display:flex;flex-wrap:wrap;gap:10px}
+.menu__social a{display:inline-block;font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  border:1px solid rgba(247,244,237,.25);padding:9px 14px;transition:background-color .4s,color .4s,border-color .4s}
+.menu__social a:hover,.menu__social a:focus-visible{background:var(--ivory);color:var(--charcoal);border-color:var(--ivory)}
+@media (min-width:640px){.menu__meta{grid-template-columns:1fr 1fr 1.2fr}}
+@media (max-height:640px){.menu__inner{padding-top:100px}.menu__link{font-size:1.5rem}}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;color:var(--ivory);
+  overflow:hidden;background:var(--charcoal)}
+@supports not (height:100svh){.hero{min-height:100vh}}
+.hero__media,.hero__scrim{position:absolute;inset:0}
+.hero__media img{width:100%;height:100%;object-fit:cover;object-position:center;will-change:transform}
+.hero__scrim{background:linear-gradient(to top,rgba(13,12,10,.84) 0%,rgba(13,12,10,.34) 40%,rgba(13,12,10,.12) 68%,rgba(13,12,10,.42) 100%)}
+.hero__content{position:relative;z-index:2;width:100%;padding-block:0 clamp(110px,16vh,170px)}
+.hero__label{display:inline-flex;align-items:center;gap:14px;
+  font-size:.66rem;font-weight:700;letter-spacing:.3em;text-transform:uppercase;
+  color:rgba(247,244,237,.75);margin-bottom:clamp(20px,3vh,32px)}
+.hero__label::before{content:"";width:44px;height:1px;background:currentColor}
+.hero__title{font-family:var(--serif);font-weight:400;
+  font-size:clamp(2.3rem,8.6vw,8rem);line-height:.99;letter-spacing:-.005em;text-transform:uppercase}
+.hero__title em{font-style:italic}
+.hero__low{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;
+  gap:clamp(24px,4vw,56px);margin-top:clamp(30px,5vh,48px)}
+.hero__text{max-width:44ch;font-size:clamp(.92rem,1.05vw,1.05rem);line-height:1.8;color:rgba(247,244,237,.85)}
+.hero__scroll{position:absolute;right:var(--pad);bottom:clamp(28px,5vh,54px);z-index:3;display:none;
+  flex-direction:column;align-items:center;gap:12px;
+  font-size:.58rem;font-weight:700;letter-spacing:.32em;text-transform:uppercase;color:rgba(247,244,237,.7)}
+.hero__scroll .line{position:relative;width:1px;height:56px;background:rgba(247,244,237,.28);overflow:hidden}
+.hero__scroll .line::after{content:"";position:absolute;left:0;top:-100%;width:100%;height:100%;background:var(--ivory);
+  animation:scrollLine 2.4s var(--ease-io) infinite}
+@keyframes scrollLine{0%{top:-100%}55%{top:0}100%{top:100%}}
+@media (min-width:900px){.hero__scroll{display:flex}}
+
+/* ---------- FEATURED STORY ---------- */
+.fstory{background:var(--beige)}
+.fstory__frame{aspect-ratio:16/10}
+@media (min-width:1000px){.fstory__frame{aspect-ratio:21/9}}
+.fstory__body{display:grid;grid-template-columns:1fr;gap:26px;margin-top:clamp(34px,6vh,56px)}
+.fstory__title{font-family:var(--serif);font-weight:400;
+  font-size:clamp(1.7rem,3.6vw,3.4rem);line-height:1.1;letter-spacing:-.005em;max-width:24ch}
+.fstory__title a{transition:opacity .3s}
+.fstory__title a:hover,.fstory__title a:focus-visible{opacity:.72}
+.fstory__excerpt{max-width:52ch;color:rgba(23,23,23,.75);line-height:1.85;font-size:.97rem}
+.fstory__side{display:flex;flex-direction:column;gap:18px;align-items:flex-start;justify-content:flex-end}
+@media (min-width:900px){
+  .fstory__body{grid-template-columns:repeat(12,1fr)}
+  .fstory__title{grid-column:1/9}
+  .fstory__side{grid-column:9/13}
+}
+
+/* ---------- FILTERS ---------- */
+.filters{display:flex;flex-wrap:wrap;gap:10px 12px;margin-bottom:clamp(22px,4vh,36px)}
+.filter-btn{position:relative;padding:11px 18px;border:1px solid var(--line);
+  font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--mut);
+  background:transparent;cursor:pointer;
+  transition:color .35s ease,border-color .35s ease,background-color .35s ease}
+.filter-btn:hover,.filter-btn:focus-visible{color:var(--charcoal);border-color:var(--charcoal)}
+.filter-btn[aria-pressed="true"]{background:var(--charcoal);color:var(--ivory);border-color:var(--charcoal)}
+.news-status{font-size:.58rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mut);
+  margin-bottom:clamp(28px,4vh,44px)}
+
+/* ---------- NEWS GRID ---------- */
+.news-grid{display:grid;grid-template-columns:1fr;gap:clamp(40px,7vh,72px)}
+.news-item{position:relative}
+.news-item.is-hidden{display:none !important}
+.news-item.is-extra{display:none}
+.news-item .frame img{transition:transform .9s var(--ease)}
+.news-item:hover .frame img{transform:scale(1.05)}
+.news-item__body{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.news-item__title{font-family:var(--serif);font-weight:400;
+  font-size:clamp(1.15rem,1.8vw,1.6rem);line-height:1.18;letter-spacing:-.005em}
+.news-item__title a{transition:opacity .3s}
+.news-item__title a:hover,.news-item__title a:focus-visible{opacity:.72}
+.news-item__excerpt{max-width:52ch;color:rgba(23,23,23,.72);line-height:1.75;font-size:.9rem}
+.news-item__foot{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:6px}
+.news-item__more{position:relative;display:inline-flex;align-items:center;justify-content:center;
+  width:42px;height:42px;flex:none;border:1px solid var(--line);border-radius:50%;
+  transition:background-color .4s,color .4s,border-color .4s,transform .5s var(--ease)}
+.news-item__more .ico{width:15px;height:15px;transition:transform .5s var(--ease)}
+.news-item:hover .news-item__more{background:var(--charcoal);color:var(--ivory);border-color:var(--charcoal)}
+.news-item:hover .news-item__more .ico{transform:translateX(3px)}
+.news-empty{display:none;padding:clamp(50px,8vh,90px) 0;border-top:1px solid var(--line);
+  color:var(--mut);font-size:.95rem}
+.news-more{display:flex;flex-direction:column;align-items:center;gap:16px;
+  margin-top:clamp(44px,7vh,80px)}
+.news-more__note{font-size:.58rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mut)}
+@media (min-width:900px){
+  .news-grid{grid-template-columns:repeat(12,1fr);gap:clamp(24px,3vw,48px)}
+  .news-item--1{grid-column:1/8}
+  .news-item--2{grid-column:8/13;margin-top:clamp(60px,10vw,140px)}
+  .news-item--3{grid-column:1/5;margin-top:clamp(40px,7vw,90px)}
+  .news-item--4{grid-column:6/11;margin-top:clamp(60px,9vw,120px)}
+  .news-item--5{grid-column:1/6;margin-top:clamp(40px,7vw,90px)}
+  .news-item--6{grid-column:7/13;margin-top:clamp(20px,4vw,50px)}
+  .news-item--7{grid-column:2/8;margin-top:clamp(40px,7vw,90px)}
+  .news-item--8{grid-column:8/13;margin-top:clamp(60px,9vw,120px)}
+}
+
+/* ---------- FEATURED ACHIEVEMENT ---------- */
+.achv{background:var(--charcoal);color:var(--ivory)}
+.achv__grid{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(24px,3vw,48px);align-items:center}
+.achv__media{grid-column:1/-1}
+.achv__media .frame{aspect-ratio:16/10}
+.achv__body{grid-column:1/-1;display:flex;flex-direction:column;gap:20px}
+.achv__title{font-family:var(--serif);font-weight:400;
+  font-size:clamp(2.2rem,5.4vw,4.8rem);line-height:1.02;text-transform:uppercase;letter-spacing:-.005em}
+.achv__title em{font-style:italic}
+.achv__p{max-width:48ch;color:rgba(247,244,237,.78);line-height:1.85;font-size:.97rem}
+.achv__meta{font-size:.58rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(247,244,237,.5)}
+@media (min-width:1000px){
+  .achv__media{grid-column:1/8}
+  .achv__media .frame{aspect-ratio:4/3}
+  .achv__body{grid-column:8/13}
+}
+
+/* ---------- EVENTS (timeline list) ---------- */
+.events__list{border-top:1px solid var(--line)}
+.event{display:grid;grid-template-columns:auto 1fr auto;grid-template-rows:auto auto;
+  gap:6px clamp(16px,3vw,44px);align-items:center;
+  padding:clamp(22px,3.6vh,36px) 0;border-bottom:1px solid var(--line);
+  transition:background-color .4s ease}
+.event:hover{background:rgba(23,23,23,.03)}
+.event__date{grid-row:1/3;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:74px}
+.event__date .d{font-family:var(--serif);font-size:clamp(1.7rem,2.6vw,2.4rem);line-height:1}
+.event__date .m{font-size:.56rem;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--mut)}
+.event__name{grid-column:2;font-family:var(--serif);font-weight:400;
+  font-size:clamp(1.2rem,2.2vw,1.9rem);line-height:1.15;transition:transform .5s var(--ease)}
+.event:hover .event__name{transform:translateX(clamp(6px,1vw,14px))}
+.event__loc{grid-column:2;font-size:.6rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--mut)}
+.event__link{grid-column:3;grid-row:1/3;align-self:center;
+  display:inline-flex;align-items:center;justify-content:center;
+  width:46px;height:46px;flex:none;border:1px solid var(--line);border-radius:50%;
+  transition:background-color .4s,color .4s,border-color .4s,transform .5s var(--ease)}
+.event__link .ico{width:16px;height:16px;transition:transform .5s var(--ease)}
+.event:hover .event__link,.event__link:focus-visible{background:var(--charcoal);color:var(--ivory);border-color:var(--charcoal)}
+.event:hover .event__link .ico{transform:translateX(3px)}
+@media (min-width:900px){
+  .event{grid-template-columns:auto 1fr auto auto;grid-template-rows:auto}
+  .event__name{grid-column:2;grid-row:1}
+  .event__loc{grid-column:3;grid-row:1;text-align:right}
+  .event__link{grid-column:4;grid-row:1}
+}
+
+/* ---------- FOLLOW CTA ---------- */
+.follow{background:var(--beige)}
+.follow__inner{display:flex;flex-direction:column;gap:clamp(22px,4vh,36px);align-items:flex-start}
+.follow__statement{font-family:var(--serif);font-weight:400;
+  font-size:clamp(2.2rem,7vw,7rem);line-height:1.02;text-transform:uppercase;letter-spacing:-.005em}
+.follow__statement em{font-style:italic}
+.follow__text{max-width:46ch;color:rgba(23,23,23,.78);line-height:1.85;font-size:clamp(.92rem,1.05vw,1.05rem)}
+.follow__social{display:flex;flex-wrap:wrap;gap:10px;margin-top:clamp(6px,1.5vh,16px)}
+.follow__social a{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);
+  padding:11px 18px;font-size:.6rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  transition:background-color .4s,color .4s,border-color .4s}
+.follow__social a:hover,.follow__social a:focus-visible{background:var(--charcoal);color:var(--ivory);border-color:var(--charcoal)}
+
+/* ---------- FOOTER ---------- */
+.footer{background:var(--ink-2);color:var(--ivory)}
+.footer__top{padding-block:clamp(90px,14vh,160px) 0}
+.footer__staterow{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;
+  gap:clamp(28px,4vw,60px);padding-bottom:clamp(60px,9vh,100px)}
+.footer__statement{font-family:var(--serif);font-weight:400;
+  font-size:clamp(2.3rem,6.4vw,5.9rem);line-height:1.04;text-transform:uppercase;letter-spacing:-.005em;max-width:12ch}
+.footer__statement em{font-style:italic}
+.footer__cta{position:relative;isolation:isolate;overflow:hidden;flex:1 1 100%;
+  display:flex;flex-direction:column;justify-content:space-between;
+  gap:clamp(30px,4vw,52px);padding:clamp(20px,2.4vw,28px) clamp(20px,2.6vw,32px);
+  border:1px solid rgba(247,244,237,.3);border-radius:2px;color:var(--ivory);
+  text-decoration:none;transition:border-color .5s ease,color .5s ease}
+.footer__cta::before{content:"";position:absolute;inset:0;z-index:0;background:var(--ivory);
+  transform:scaleY(0);transform-origin:bottom;transition:transform .55s var(--ease-io)}
+.footer__cta>*{position:relative;z-index:1}
+.footer__cta-label{font-size:.62rem;font-weight:700;letter-spacing:.26em;text-transform:uppercase;
+  opacity:.7;transition:transform .5s var(--ease)}
+.footer__cta-row{display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+  transition:transform .5s var(--ease)}
+.footer__cta-text{font-size:clamp(1.05rem,1.7vw,1.35rem);font-weight:800;line-height:1.1;
+  letter-spacing:.14em;text-transform:uppercase}
+.footer__cta-arrow{font-size:clamp(1rem,1.4vw,1.2rem);line-height:1;transition:transform .5s var(--ease)}
+.footer__cta:hover::before,.footer__cta:focus-visible::before{transform:scaleY(1)}
+.footer__cta:hover,.footer__cta:focus-visible{color:var(--charcoal);border-color:var(--ivory)}
+.footer__cta:hover .footer__cta-label,.footer__cta:focus-visible .footer__cta-label,
+.footer__cta:hover .footer__cta-row,.footer__cta:focus-visible .footer__cta-row{transform:translateX(4px)}
+.footer__cta:hover .footer__cta-arrow,.footer__cta:focus-visible .footer__cta-arrow{transform:translateY(-4px)}
+.footer__cta:focus-visible{outline:2px solid var(--ivory);outline-offset:4px}
+@media (min-width:860px){.footer__cta{flex:0 0 auto;width:clamp(300px,32vw,460px)}}
+.footer__grid{display:grid;grid-template-columns:1fr;gap:clamp(36px,5vw,56px);
+  padding-block:clamp(50px,8vh,80px);border-top:1px solid var(--line-lt)}
+.footer .brand__name{font-size:1.5rem}
+.footer__blurb{margin-top:18px;max-width:34ch;color:rgba(247,244,237,.66);font-size:.9rem;line-height:1.8}
+.footer__col h3{font-size:.6rem;font-weight:700;letter-spacing:.26em;text-transform:uppercase;
+  color:rgba(247,244,237,.5);margin-bottom:20px;font-weight:700}
+.footer__col ul{display:flex;flex-direction:column;gap:12px}
+.footer__col a,.footer__col p{font-size:.92rem;color:rgba(247,244,237,.86);line-height:1.65}
+.footer__col a{position:relative;display:inline-block;transition:color .3s}
+.footer__col a::after{content:"";position:absolute;left:0;bottom:-2px;width:100%;height:1px;background:currentColor;
+  transform:scaleX(0);transform-origin:right;transition:transform .4s var(--ease-io)}
+.footer__col a:hover,.footer__col a:focus-visible{color:var(--ivory)}
+.footer__col a:hover::after,.footer__col a:focus-visible::after{transform:scaleX(1);transform-origin:left}
+.footer__social{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.footer__social a{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(247,244,237,.22);
+  padding:9px 16px;font-size:.58rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  transition:background-color .4s,color .4s,border-color .4s}
+.footer__social a:hover,.footer__social a:focus-visible{background:var(--ivory);color:var(--charcoal);border-color:var(--ivory)}
+.footer__bottom{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;
+  padding-block:26px;border-top:1px solid var(--line-lt);
+  font-size:.58rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:rgba(247,244,237,.55)}
+.footer__credit{color:rgba(247,244,237,.85)}
+.footer__credit .name{font-family:var(--serif);font-style:italic;text-transform:none;
+  letter-spacing:.06em;font-size:.8rem;border-bottom:1px solid rgba(247,244,237,.4);
+  transition:border-color .3s,color .3s}
+.footer__credit a:hover .name{color:var(--ivory);border-color:var(--ivory)}
+@media (min-width:860px){.footer__grid{grid-template-columns:1.6fr 1fr 1fr 1.3fr}}
+
+/* ---------- PAGE LOADER + TRANSITION VEIL ---------- */
+.pt-loader{position:fixed;inset:0;z-index:500;background:var(--ivory);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.pt-loader__inner{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.pt-loader__mask{display:block;overflow:hidden;padding-bottom:.08em;margin-bottom:-.08em}
+.pt-loader__brand{display:block;font-family:var(--serif);font-weight:400;font-size:clamp(2.2rem,6vw,3.6rem);line-height:1;text-transform:uppercase;letter-spacing:.02em;color:var(--charcoal)}
+.pt-loader__brand--sub{font-family:var(--sans);font-size:.6rem;font-weight:700;letter-spacing:.52em;text-transform:uppercase;color:var(--mut);margin-top:2px}
+.pt-loader__bar{position:relative;display:block;width:min(220px,42vw);height:1px;margin-top:26px;background:rgba(23,23,23,.16);overflow:hidden}
+.pt-loader__bar i{position:absolute;inset:0;background:var(--charcoal);transform:scaleX(0);transform-origin:left;will-change:transform}
+.pt-veil{position:fixed;inset:0;z-index:480;background:var(--ivory);transform:translateY(101%);pointer-events:none;will-change:transform}
+/* ---------- REDUCED MOTION ---------- */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;scroll-behavior:auto !important}
+  .hero__scroll .line::after{animation:none}
+  .ml__i{transform:none !important}
+}
+</style>
+<noscript><style>.pt-loader,.pt-veil{display:none !important}</style></noscript></head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="grain" aria-hidden="true"></div><div class="pt-loader" id="ptLoader" aria-hidden="true"><div class="pt-loader__inner"><span class="pt-loader__mask"><span class="pt-loader__brand">Allegiance</span></span><span class="pt-loader__mask"><span class="pt-loader__brand pt-loader__brand--sub">Academy</span></span><span class="pt-loader__bar"><i></i></span></div></div><div class="pt-veil" id="ptVeil" aria-hidden="true"></div>
+
+<!-- ================= HEADER ================= -->
+<header class="site-header" id="top">
+  <div class="wrap bar">
+    <a class="brand" href="index.html" aria-label="Allegiance Academy — home">
+      <span class="brand__name">Allegiance</span>
+      <span class="brand__sub">Academy</span>
+    </a>
+    <!-- Cross-page links: HOME / ABOUT / CLUBS / HOUSES / NEWS resolve to existing pages; the rest
+         deep-link into index.html sections and should be updated to their own pages as they are created. -->
+    <nav class="nav" aria-label="Primary">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="clubs.html">Clubs</a></li>
+        <li><a href="houses.html">Houses</a></li>
+        <li><a href="news.html" aria-current="page">News</a></li>
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="admission.html">Admission</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="header-end">
+      <a class="btn btn--solid btn--sm header-cta" href="admission.html">Apply Now</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu">
+        <span class="l"></span><span class="l"></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ================= MOBILE MENU ================= -->
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Site menu">
+  <div class="menu__inner">
+    <ul class="menu__list">
+      <li class="menu__item"><a class="menu__link" href="index.html"><span class="n">01</span>Home</a></li>
+      <li class="menu__item"><a class="menu__link" href="about.html"><span class="n">02</span>About</a></li>
+      <li class="menu__item"><a class="menu__link" href="clubs.html"><span class="n">03</span>Clubs</a></li>
+      <li class="menu__item"><a class="menu__link" href="houses.html"><span class="n">04</span>Houses</a></li>
+      <li class="menu__item"><a class="menu__link" href="news.html" aria-current="page"><span class="n">05</span>News</a></li>
+      <li class="menu__item"><a class="menu__link" href="gallery.html"><span class="n">06</span>Gallery</a></li>
+      <li class="menu__item"><a class="menu__link" href="admission.html"><span class="n">07</span>Admission</a></li>
+      <li class="menu__item"><a class="menu__link" href="contact.html"><span class="n">08</span>Contact</a></li>
+    </ul>
+    <div class="menu__meta">
+      <!-- PLACEHOLDER: replace contact details with real institutional information. -->
+      <div>
+        <span class="label">Admissions</span>
+        <p><a href="admission.html">Apply to Allegiance →</a></p>
+        <p>Session 2027–28 applications open soon.</p>
+      </div>
+      <div>
+        <span class="label">Contact</span>
+        <p><a href="mailto:admissions@allegianceacademy.in">admissions@allegianceacademy.in</a><br>
+        <a href="tel:+910000000000">+91 00000 00000</a></p>
+      </div>
+      <div>
+        <span class="label">Follow</span>
+        <div class="menu__social">
+          <a href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Allegiance Academy on Instagram">IG</a>
+          <a href="https://www.facebook.com/" target="_blank" rel="noopener" aria-label="Allegiance Academy on Facebook">FB</a>
+          <a href="https://www.youtube.com/" target="_blank" rel="noopener" aria-label="Allegiance Academy on YouTube">YT</a>
+          <a href="https://www.linkedin.com/" target="_blank" rel="noopener" aria-label="Allegiance Academy on LinkedIn">LN</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="top" aria-label="News and announcements from Allegiance Academy">
+  <div class="hero__media">
+    <!-- PLACEHOLDER IMAGE: replace with a photograph from a recent school event. -->
+    <img src="./assets/news/photo-1507842217343-583bb7270b66.jpg"
+         alt="Sunlit reading room of the academy library" fetchpriority="high">
+  </div>
+  <div class="hero__scrim" aria-hidden="true"></div>
+  <div class="wrap hero__content">
+    <p class="hero__label">News &amp; Announcements</p>
+    <h1 class="hero__title">
+      <span class="ml"><span class="ml__i">What's</span></span>
+      <span class="ml"><span class="ml__i"><em>Happening.</em></span></span>
+    </h1>
+    <div class="hero__low">
+      <p class="hero__text">Stories, achievements and moments from Allegiance Academy.</p>
+    </div>
+  </div>
+  <div class="hero__scroll" aria-hidden="true"><span class="line"></span><span>Scroll</span></div>
+</section>
+
+<!-- ================= FEATURED STORY ================= -->
+<section class="section fstory" id="featured-story" aria-label="Featured story">
+  <div class="wrap">
+    <p class="label label--flat" data-reveal><span class="no">01</span> — Featured Story</p>
+    <!-- PLACEHOLDER: sample story — replace with real news, dates and links. -->
+    <figure data-reveal>
+      <div class="frame fstory__frame">
+        <img class="img-plx" src="./assets/news/photo-1461896836934-ffe607ba8211.jpg"
+             alt="Sprinters at the line during the inter-house athletics finals" loading="lazy">
+      </div>
+      <figcaption class="framecap"><span>The final relay, last bend</span><span>Journal — 2026</span></figcaption>
+    </figure>
+    <div class="fstory__body">
+      <h2 class="fstory__title" data-reveal><a href="#stories">Shubhas House takes the athletics shield on the final relay</a></h2>
+      <div class="fstory__side" data-reveal>
+        <p class="meta"><time datetime="2026-08-28">28 Aug 2026</time><span class="dot dot--sports"></span><span>Sports</span></p>
+        <p class="fstory__excerpt">Ninety metres from the line, the anchor leg pulled two houses level — and the loudest finish of the year decided a shield that had changed hands all afternoon.</p>
+        <a class="textlink" href="#stories">Read Story
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= NEWS GRID + FILTERS ================= -->
+<section class="section" id="stories" aria-labelledby="stories-title">
+  <div class="wrap">
+    <div class="sec-head sec-head--split">
+      <div>
+        <p class="label" data-reveal><span class="no">02</span> — The Journal</p>
+        <h2 class="display sec-title" id="stories-title" data-reveal>Everything in <em>print.</em></h2>
+      </div>
+      <p class="sec-intro" data-reveal>Filter the year so far by what you are looking for.</p>
+    </div>
+    <!-- PLACEHOLDER: all stories below are sample content — replace with the school's real news. -->
+    <div class="filters" role="group" aria-label="Filter stories by category" data-reveal>
+      <button class="filter-btn" type="button" data-filter="all" aria-pressed="true">All</button>
+      <button class="filter-btn" type="button" data-filter="academic" aria-pressed="false">Academic</button>
+      <button class="filter-btn" type="button" data-filter="sports" aria-pressed="false">Sports</button>
+      <button class="filter-btn" type="button" data-filter="culture" aria-pressed="false">Culture</button>
+      <button class="filter-btn" type="button" data-filter="events" aria-pressed="false">Events</button>
+      <button class="filter-btn" type="button" data-filter="achievements" aria-pressed="false">Achievements</button>
+      <button class="filter-btn" type="button" data-filter="announcements" aria-pressed="false">Announcements</button>
+    </div>
+    <p class="news-status" id="newsStatus" aria-live="polite"></p>
+    <div class="news-grid" id="newsGrid" data-reveal>
+
+      <article class="news-item news-item--1" data-cat="sports">
+        <div class="frame a-43"><img src="./assets/news/photo-1528819622765-d6bcf132f793.jpg" alt="A chessboard mid-match during the district tournament" loading="lazy"></div>
+        <div class="news-item__body">
+          <p class="meta"><time datetime="2026-08-30">30 Aug 2026</time><span class="dot"></span><span>Sports</span></p>
+          <h3 class="news-item__title"><a href="clubs.html">The chess team sweeps the district tournament</a></h3>
+          <p class="news-item__excerpt">Five boards, five wins — the quietest room in school had the loudest result of the week.</p>
+          <div class="news-item__foot">
+            <a class="news-item__more" href="clubs.html" aria-label="Read story: The chess team sweeps the district tournament"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 7l5 5-5 5"/></svg></a>
+          </div>
+        </div>
+      </article>
+
+      <article class="news-item news-item--2" data-cat="culture">
+        <div class="frame a-45"><img src="./assets/news/photo-1516280440614-37939bbacd81.jpg" alt="Stage lights above the annual production set" loading="lazy"></div>
+        <div class="news-item__body">
+          <p class="meta"><time datetime="2026-08-21">21 Aug 2026</time><span class="dot"></span><span>Culture</span></p>
+          <h3 class="news-item__title"><a href="gallery.html">The annual play sells out all three nights</a></h3>
+          <p class="news-item__excerpt">Sixty students on stage and behind it. The corridors will be quoting lines until winter.</p>
+          <div class="news-item__foot">
+            <a class="news-item__more" href="gallery.html" aria-label="Read story: The annual play sells out all three nights"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 7l5 5-5 5"/></svg></a>
+          </div>
+        </div>
+      </article>
+
+      <article class="news-item news-item--3" data-cat="academic">
+        <div class="frame a-34"><img src="./assets/news/photo-1562774053-701939374585.jpg" alt="The new Centre for Science and Innovation at dusk" loading="lazy"></div>
+        <div class="news-item__body">
+          <p class="meta"><time datetime="2026-08-12">12 Aug 2026</time><span class="dot"></span><span>Academic</span></p>
+          <h3 class="news-item__title"><a href="about.html">New Centre for Science &amp; Innovation opens its labs</a></h3>
+          <p class="news-item__excerpt">Three laboratories, a maker space and an observatory — open to every grade, from day one.</p>
+          <div class="news-item__foot">
+            <a class="news-item__more" href="about.html" aria-label="Read story: New Centre for Science and Innovation opens its labs"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 7l5 5-5 5"/></svg></a>
+          </div>
+        </div>
+      </article>
+
+      <article class="news-item news-item--4" data-cat="events">
+        <div class="frame a-1610"><img src="./assets/news/photo-1475721027785-f74eccf877e2.jpg" alt="Delegates seated at the inter-school Model United Nations" loading="lazy"></div>
+        <div class="news-item__body">
+          <p class="meta"><time datetime="2026-08-05">05 Aug 2026</time><span class="dot"></span><span>Events</span></p>
+          <h3 class="news-item__title"><a href="gallery.html">Winter Model United Nations returns this December</a></h3>
+          <p class="news-item__excerpt">Committees, country decks and three days of diplomacy — registrations open after autumn break.</p>
+          <div class="news-item__foot">
+            <a class="textlink" href="gallery.html">View Event Photos</a>
+            <a class="news-item__more" href="gallery.html" aria-label="Read story: Winter Model United Nations returns this December"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 7l5 5-5 5"/></svg></a>
+          </div>
+        </div>
+      </article>
+
+      <article class="news-item news-item--5" data-cat="achievements">
+        <div class="frame a-45"><img src="./assets/news/photo-1532094349884-543bc11b234d.jpg" alt="Experiment glassware from a winning science congress project" loading="lazy"></div>
+        <div class="news-item__body">
+          <p class="meta"><time datetime="2026-07-28">28 Jul 2026</time><span class="dot"></span><span>Achievements</span></p>
+          <h3 class="news-item__title"><a href="clubs.html">Five students selected for the state science congress</a></h3>
+          <p class="news-item__excerpt">A year of failed prototypes, one patient lab — and five projects going to the state stage.</p>
+          <div class="news-item__foot">
+            <a class="news-item__more" href="clubs.html" aria-label="Read story: Five students selected for the state science congress"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 7l5 5-5 5"/></svg></a>
+          </div>
+        </div>
+      </article>
+
+      <article class="news-item news-item--6" data-cat="announcements">
+        <div class="frame a-1610"><img src="./assets/news/photo-1541339907198-e08756dedf3f.jpg" alt="The academy archways on a clear autumn morning" loading="lazy"></div>
+        <div class="news-item__body">
+          <p class="meta"><time datetime="2026-07-20">20 Jul 2026</time><span class="dot"></span><span>Announcements</span></p>
+          <h3 class="news-item__title"><a href="admission.html">Session 2027–28 admission window opens this autumn</a></h3>
+          <p class="news-item__excerpt">Campus tours, application dates and scholarship information — the full admission calendar is out.</p>
+          <div class="news-item__foot">
+            <a class="news-item__more" href="admission.html" aria-label="Read story: Session 2027-28 admission window opens this autumn"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 7l5 5-5 5"/></svg></a>
+          </div>
+        </div>
+      </article>
+
+      <article class="news-item news-item--7" data-cat="culture">
+        <div class="frame a-43"><img src="./assets/news/photo-1513364776144-60967b0f800f.jpg" alt="Student-curated work on the studio wall" loading="lazy"></div>
+        <div class="news-item__body">
+          <p class="meta"><time datetime="2026-07-10">10 Jul 2026</time><span class="dot"></span><span>Culture</span></p>
+          <h3 class="news-item__title"><a href="gallery.html">Art studio hosts its first student-curated exhibition</a></h3>
+          <p class="news-item__excerpt">Chosen, hung and captioned entirely by the Grade XI studio class — open to visitors all month.</p>
+          <div class="news-item__foot">
+            <a class="news-item__more" href="gallery.html" aria-label="Read story: Art studio hosts its first student-curated exhibition"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 7l5 5-5 5"/></svg></a>
+          </div>
+        </div>
+      </article>
+
+      <article class="news-item news-item--8" data-cat="academic">
+        <div class="frame a-45"><img src="./assets/news/photo-1456513080510-7bf3a84b82f8.jpg" alt="Books and notes during the summer lecture series" loading="lazy"></div>
+        <div class="news-item__body">
+          <p class="meta"><time datetime="2026-07-01">01 Jul 2026</time><span class="dot"></span><span>Academic</span></p>
+          <h3 class="news-item__title"><a href="about.html">Summer lecture series opens to senior students</a></h3>
+          <p class="news-item__excerpt">Guest teachers, long-form seminars and no grades attached — registration is first come, first seated.</p>
+          <div class="news-item__foot">
+            <a class="news-item__more" href="about.html" aria-label="Read story: Summer lecture series opens to senior students"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 7l5 5-5 5"/></svg></a>
+          </div>
+        </div>
+      </article>
+
+      <!-- The four stories below are revealed by the Load More button (class: is-extra) -->
+      <article class="news-item news-item--5 is-extra" data-cat="sports">
+        <div class="frame a-45"><img src="./assets/news/photo-1517649763962-0c623066013b.jpg" alt="Cyclists mid-race at the inter-house meet" loading="lazy"></div>
+        <div class="news-item__body">
+          <p class="meta"><time datetime="2026-06-24">24 Jun 2026</time><span class="dot"></span><span>Sports</span></p>
+          <h3 class="news-item__title"><a href="houses.html">Inter-house cycling meet returns to the field circuit</a></h3>
+          <p class="news-item__excerpt">Four houses, one hill, and a downhill finish that nobody volunteers to time again.</p>
+          <div class="news-item__foot">
+            <a class="news-item__more" href="houses.html" aria-label="Read story: Inter-house cycling meet returns to the field circuit"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 7l5 5-5 5"/></svg></a>
+          </div>
+        </div>
+      </article>
+
+      <article class="news-item news-item--6 is-extra" data-cat="announcements">
+        <div class="frame a-1610"><img src="./assets/news/photo-1521737604893-d14cc237f11d.jpg" alt="House council members planning the term ahead" loading="lazy"></div>
+        <div class="news-item__body">
+          <p class="meta"><time datetime="2026-06-15">15 Jun 2026</time><span class="dot"></span><span>Announcements</span></p>
+          <h3 class="news-item__title"><a href="houses.html">House council elections announced for October</a></h3>
+          <p class="news-item__excerpt">Nominations open next month — captains, cultural secretaries and the activities council all on the ballot.</p>
+          <div class="news-item__foot">
+            <a class="news-item__more" href="houses.html" aria-label="Read story: House council elections announced for October"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 7l5 5-5 5"/></svg></a>
+          </div>
+        </div>
+      </article>
+
+      <article class="news-item news-item--7 is-extra" data-cat="events">
+        <div class="frame a-43"><img src="./assets/news/photo-1523580494863-6f3031224c94.jpg" alt="Caps in the sky on Founders' Day morning" loading="lazy"></div>
+        <div class="news-item__body">
+          <p class="meta"><time datetime="2026-06-02">02 Jun 2026</time><span class="dot"></span><span>Events</span></p>
+          <h3 class="news-item__title"><a href="gallery.html">Founders' Day weekend: full programme released</a></h3>
+          <p class="news-item__excerpt">Open houses, alumni matches and the evening concert — families are welcome on both days.</p>
+          <div class="news-item__foot">
+            <a class="news-item__more" href="gallery.html" aria-label="Read story: Founders' Day weekend full programme released"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 7l5 5-5 5"/></svg></a>
+          </div>
+        </div>
+      </article>
+
+      <article class="news-item news-item--8 is-extra" data-cat="achievements">
+        <div class="frame a-45"><img src="./assets/news/photo-1455390582262-044cdead277a.jpg" alt="A manuscript page from the new scholarship's first essay" loading="lazy"></div>
+        <div class="news-item__body">
+          <p class="meta"><time datetime="2026-05-19">19 May 2026</time><span class="dot"></span><span>Achievements</span></p>
+          <h3 class="news-item__title"><a href="admission.html">Alumni fund launches the Creativity Scholarship</a></h3>
+          <p class="news-item__excerpt">An alumni-led fund to back one student project a year — in any discipline, judged by the work itself.</p>
+          <div class="news-item__foot">
+            <a class="news-item__more" href="admission.html" aria-label="Read story: Alumni fund launches the Creativity Scholarship"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 7l5 5-5 5"/></svg></a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+    <p class="news-empty" id="newsEmpty">No stories in this filter yet — try another category or load more stories below.</p>
+    <div class="news-more" data-reveal>
+      <button class="btn" type="button" id="loadMoreBtn">Load More Stories
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v13M7 13l5 5 5-5"/></svg></button>
+      <p class="news-more__note">12 sample stories — placeholder content</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FEATURED ACHIEVEMENT ================= -->
+<section class="section achv theme-dark" id="achievement" aria-labelledby="achievement-title">
+  <div class="wrap achv__grid">
+    <figure class="achv__media" data-reveal>
+      <div class="frame">
+        <img class="img-plx" src="./assets/news/7AF9EDB0_.jpg"
+             alt="Experiment glassware from the projects selected for the state science congress" loading="lazy">
+      </div>
+    </figure>
+    <div class="achv__body">
+      <p class="label" data-reveal><span class="no">03</span> — Featured Achievement</p>
+      <h2 class="achv__title masklines" id="achievement-title">
+        <span class="ml"><span class="ml__i">Science, proven</span></span>
+        <span class="ml"><span class="ml__i"><em>on the state stage.</em></span></span>
+      </h2>
+      <p class="achv__p" data-reveal>Five student projects from the Innovation Lab were selected for the State Science Congress — the result of a full year of failed prototypes, late evenings and one very patient laboratory. Each project was judged, defended and rebuilt in public before it left campus.</p>
+      <p class="achv__meta" data-reveal>Achievements · September 2026 — placeholder story</p>
+      <div data-reveal>
+        <a class="btn btn--light btn--sm" href="#stories">Read the coverage
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= EVENTS ================= -->
+<section class="section" id="events" aria-labelledby="events-title">
+  <div class="wrap">
+    <div class="sec-head sec-head--split">
+      <div>
+        <p class="label" data-reveal><span class="no">04</span> — Upcoming Events</p>
+        <h2 class="display sec-title" id="events-title" data-reveal>Mark the <em>calendar.</em></h2>
+      </div>
+      <p class="sec-intro" data-reveal>Dates for the autumn term — families and visitors are welcome at every event marked public.</p>
+    </div>
+    <!-- PLACEHOLDER: sample dates — replace with the school's real events calendar. -->
+    <ul class="events__list">
+      <li class="event" data-reveal>
+        <div class="event__date"><span class="d">03</span><span class="m">Oct 2026</span></div>
+        <h3 class="event__name"><a href="houses.html">Inter-House Athletics Finals</a></h3>
+        <p class="event__loc">Main Field</p>
+        <a class="event__link" href="gallery.html" aria-label="View details: Inter-House Athletics Finals"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+      </li>
+      <li class="event" data-reveal>
+        <div class="event__date"><span class="d">17</span><span class="m">Oct 2026</span></div>
+        <h3 class="event__name"><a href="clubs.html">Autumn Music Evening</a></h3>
+        <p class="event__loc">Tagore Hall · Public</p>
+        <a class="event__link" href="gallery.html" aria-label="View details: Autumn Music Evening"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+      </li>
+      <li class="event" data-reveal>
+        <div class="event__date"><span class="d">31</span><span class="m">Oct 2026</span></div>
+        <h3 class="event__name"><a href="about.html">Science &amp; Innovation Open Lab</a></h3>
+        <p class="event__loc">Innovation Centre · Public</p>
+        <a class="event__link" href="gallery.html" aria-label="View details: Science and Innovation Open Lab"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+      </li>
+      <li class="event" data-reveal>
+        <div class="event__date"><span class="d">14</span><span class="m">Nov 2026</span></div>
+        <h3 class="event__name"><a href="clubs.html">Inter-School Debate Invitational</a></h3>
+        <p class="event__loc">Senior Library</p>
+        <a class="event__link" href="gallery.html" aria-label="View details: Inter-School Debate Invitational"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+      </li>
+      <li class="event" data-reveal>
+        <div class="event__date"><span class="d">05</span><span class="m">Dec 2026</span></div>
+        <h3 class="event__name"><a href="gallery.html">Winter Model United Nations</a></h3>
+        <p class="event__loc">Auditorium</p>
+        <a class="event__link" href="gallery.html" aria-label="View details: Winter Model United Nations"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= FOLLOW CTA ================= -->
+<section class="section follow" id="follow" aria-labelledby="follow-title">
+  <div class="wrap follow__inner">
+    <p class="label" data-reveal><span class="no">05</span> — Stay Close</p>
+    <h2 class="follow__statement masklines" id="follow-title">
+      <span class="ml"><span class="ml__i">Follow the</span></span>
+      <span class="ml"><span class="ml__i"><em>journey.</em></span></span>
+    </h2>
+    <p class="follow__text" data-reveal>Match reports, exhibition openings, admission dates and the occasional very good dog on the junior field — the year, as it happens.</p>
+    <!-- PLACEHOLDER: point these to the school's real social profiles. -->
+    <div class="follow__social" data-reveal>
+      <a href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Allegiance Academy on Instagram">Instagram</a>
+      <a href="https://www.facebook.com/" target="_blank" rel="noopener" aria-label="Allegiance Academy on Facebook">Facebook</a>
+      <a href="https://www.youtube.com/" target="_blank" rel="noopener" aria-label="Allegiance Academy on YouTube">YouTube</a>
+      <a href="https://www.linkedin.com/" target="_blank" rel="noopener" aria-label="Allegiance Academy on LinkedIn">LinkedIn</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer theme-dark" id="contact">
+  <div class="wrap">
+    <div class="footer__top">
+      <div class="footer__staterow">
+        <p class="footer__statement masklines">
+          <span class="ml"><span class="ml__i">Where curiosity</span></span>
+          <span class="ml"><span class="ml__i"><em>becomes character.</em></span></span>
+        </p>
+        <a class="footer__cta" href="admission.html">
+          <span class="footer__cta-label">Ready to begin?</span>
+          <span class="footer__cta-row">
+            <span class="footer__cta-text">Apply now</span>
+            <span class="footer__cta-arrow" aria-hidden="true">&#8599;</span>
+          </span>
+        </a>
+      </div>
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <a class="brand" href="index.html" aria-label="Allegiance Academy — home">
+            <span class="brand__name">Allegiance</span>
+            <span class="brand__sub">Academy</span>
+          </a>
+          <p class="footer__blurb">A community of learners where curiosity, creativity, confidence and character grow together.</p>
+          <div class="footer__social">
+            <!-- PLACEHOLDER: point these to the school's real social profiles. -->
+            <a href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Allegiance Academy on Instagram">Instagram</a>
+            <a href="https://www.facebook.com/" target="_blank" rel="noopener" aria-label="Allegiance Academy on Facebook">Facebook</a>
+            <a href="https://www.youtube.com/" target="_blank" rel="noopener" aria-label="Allegiance Academy on YouTube">YouTube</a>
+            <a href="https://www.linkedin.com/" target="_blank" rel="noopener" aria-label="Allegiance Academy on LinkedIn">LinkedIn</a>
+          </div>
+        </div>
+        <nav class="footer__col" aria-label="Footer — explore">
+          <h3>Explore</h3>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="clubs.html">Clubs</a></li>
+            <li><a href="houses.html">Houses</a></li>
+            <li><a href="news.html">News</a></li>
+            <li><a href="gallery.html">Gallery</a></li>
+          </ul>
+        </nav>
+        <nav class="footer__col" aria-label="Footer — admissions">
+          <h3>Admissions</h3>
+          <ul>
+            <li><a href="admission.html">Admissions overview</a></li>
+            <li><a href="admission.html#form">Apply now</a></li>
+            <li><a href="admission.html">Scholarships</a></li>
+            <li><a href="admission.html">Visit the campus</a></li>
+            <li><a href="admission.html">Fee structure</a></li>
+          </ul>
+        </nav>
+        <div class="footer__col">
+          <h3>Contact</h3>
+          <!-- PLACEHOLDER: replace with the school's real address and contact details. -->
+          <ul>
+            <li><p>Allegiance Academy Campus,<br>Education City Road, Your City</p></li>
+            <li><a href="mailto:admissions@allegianceacademy.in">admissions@allegianceacademy.in</a></li>
+            <li><a href="tel:+910000000000">+91 00000 00000</a></li>
+            <li><p>Mon–Sat · 08:30–16:30 IST</p></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <p>© <span id="year">2026</span> Allegiance Academy — All rights reserved</p>
+      <p class="footer__credit">Crafted by <a href="index.html"><span class="name">Gourav</span></a></p>
+    </div>
+  </div>
+</footer>
+
+</main>
+
+<!-- ================= SCRIPTS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* Fail-safe: hide the loader even if later initialization throws. */
+  window.setTimeout(function () {
+    var _pl = document.getElementById('ptLoader');
+    if (_pl) { _pl.hidden = true; _pl.style.display = 'none'; }
+  }, 2600);
+
+  var doc = document;
+  var root = doc.documentElement;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hasGsap = typeof window.gsap !== 'undefined';
+  var hasST = hasGsap && typeof window.ScrollTrigger !== 'undefined';
+  if (hasST) { gsap.registerPlugin(ScrollTrigger); }
+
+  /* ---------- Footer year ---------- */
+  var yearEl = doc.getElementById('year');
+  if (yearEl) { yearEl.textContent = String(new Date().getFullYear()); }
+
+  /* ---------- Smooth scrolling (Lenis) ---------- */
+  var lenis = null;
+  if (!reduce && typeof window.Lenis !== 'undefined' && hasGsap) {
+    lenis = new Lenis({
+      duration: 1.15,
+      easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
+      smoothWheel: true
+    });
+    if (hasST) { lenis.on('scroll', ScrollTrigger.update); }
+    gsap.ticker.add(function (time) { lenis.raf(time * 1000); });
+    gsap.ticker.lagSmoothing(0);
+  }
+
+  /* ---------- Header scroll state ---------- */
+  var header = doc.querySelector('.site-header');
+  var headerShrunk = false;
+  function updateHeader(y) {
+    var s = y > 32;
+    if (s !== headerShrunk && header) {
+      headerShrunk = s;
+      header.classList.toggle('is-scrolled', s);
+    }
+  }
+  if (lenis) {
+    lenis.on('scroll', function (e) { updateHeader(e.scroll || 0); });
+  } else {
+    window.addEventListener('scroll', function () {
+      updateHeader(window.scrollY || window.pageYOffset || 0);
+    }, { passive: true });
+  }
+  updateHeader(window.scrollY || 0);
+
+  /* ---------- Mobile menu ---------- */
+  var toggle = doc.querySelector('.nav-toggle');
+  var menu = doc.getElementById('menu');
+  var menuOpen = false;
+  function setMenu(open) {
+    if (!menu || !toggle) { return; }
+    menuOpen = open;
+    menu.classList.toggle('is-open', open);
+    root.classList.toggle('menu-open', open);
+    root.classList.toggle('menu-locked', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    if (lenis) { if (open) { lenis.stop(); } else { lenis.start(); } }
+    if (open) {
+      var first = menu.querySelector('a, button');
+      if (first) { first.focus({ preventScroll: true }); }
+    }
+  }
+  if (toggle && menu) {
+    toggle.addEventListener('click', function () { setMenu(!menuOpen); });
+    doc.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && menuOpen) { setMenu(false); toggle.focus({ preventScroll: true }); }
+    });
+    window.addEventListener('resize', function () {
+      if (menuOpen && window.innerWidth > 1080) { setMenu(false); }
+    });
+    menu.addEventListener('click', function (e) {
+      if (e.target.closest('a')) { setMenu(false); }
+    });
+  }
+
+  /* ---------- Same-page anchor navigation ---------- */
+  var HEADER_OFFSET = 76;
+  Array.prototype.slice.call(doc.querySelectorAll('a[href^="#"]')).forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var id = a.getAttribute('href');
+      if (!id || id === '#') { e.preventDefault(); return; }
+      var target = doc.querySelector(id);
+      if (!target) { return; }
+      e.preventDefault();
+      if (menuOpen) { setMenu(false); }
+      if (lenis) {
+        lenis.scrollTo(target, { offset: -HEADER_OFFSET, duration: 1.4 });
+      } else {
+        target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  /* ---------- Unified shell: active nav · loader · page transitions ---------- */
+  (function () {
+    var page = (window.location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    Array.prototype.forEach.call(doc.querySelectorAll('.nav a[href], .menu__link'), function (l) {
+      var href = l.getAttribute('href') || '';
+      var target = href.split('#')[0].toLowerCase();
+      if (!target) { return; }
+      if (target === page) {
+        l.setAttribute('aria-current', 'page');
+        l.classList.add('is-active');
+      } else {
+        l.removeAttribute('aria-current');
+        l.classList.remove('is-active');
+      }
+    });
+  })();
+
+  var ptLoader = doc.getElementById('ptLoader');
+  var ptVeil = doc.getElementById('ptVeil');
+  var ptBusy = false;
+
+  function ptHideLoader() {
+    if (ptLoader && !ptLoader.hidden) {
+      ptLoader.hidden = true;
+      ptLoader.style.display = 'none';
+    }
+  }
+  window.setTimeout(ptHideLoader, 2600); /* safety net */
+
+  function ptRunIntro() {
+    if (!ptLoader) { return; }
+    if (hasGsap && !reduce) {
+      gsap.timeline()
+        .from('.pt-loader__brand', { yPercent: 120, duration: 0.7, ease: 'power4.out', stagger: 0.08 })
+        .to('.pt-loader__bar i', { scaleX: 1, duration: 0.6, ease: 'power2.inOut' }, '-=0.35')
+        .to(ptLoader, { yPercent: -100, duration: 0.75, ease: 'power4.inOut', delay: 0.1 })
+        .set(ptLoader, { display: 'none' });
+    } else {
+      ptHideLoader();
+    }
+  }
+  ptRunIntro();
+
+  function ptGo(href) {
+    if (reduce || !hasGsap || !ptVeil || ptBusy) { window.location.href = href; return; }
+    ptBusy = true;
+    gsap.timeline()
+      .set(ptVeil, { yPercent: 101 })
+      .to(ptVeil, { yPercent: 0, duration: 0.55, ease: 'power4.inOut',
+        onComplete: function () { window.location.href = href; } });
+  }
+
+  doc.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button !== 0) { return; }
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) { return; }
+    var link = e.target.closest ? e.target.closest('a[href]') : null;
+    if (!link) { return; }
+    if (link.target && link.target !== '_self') { return; }
+    if (link.hasAttribute('download')) { return; }
+    var href = link.getAttribute('href') || '';
+    if (!href || href.charAt(0) === '#') { return; }
+    if (/^(mailto:|tel:|javascript:)/i.test(href)) { return; }
+    var url;
+    try { url = new URL(href, window.location.href); } catch (err) { return; }
+    if (url.origin !== window.location.origin) { return; }
+    if (url.pathname.replace(/\/+$/, '') === window.location.pathname.replace(/\/+$/, '')) { return; }
+    e.preventDefault();
+    ptGo(url.href);
+  });
+
+  window.addEventListener('pageshow', function (e) {
+    if (e.persisted) {
+      ptBusy = false;
+      if (ptVeil && hasGsap) { gsap.set(ptVeil, { yPercent: 101 }); }
+      ptHideLoader();
+      if (lenis) { lenis.start(); }
+    }
+  });
+
+  /* ---------- Motion (skipped entirely for reduced-motion users) ---------- */
+  if (hasST && !reduce) {
+
+    /* Hero: image settles, scrim reveals, content staggers in */
+    var heroImg = doc.querySelector('.hero__media img');
+    gsap.timeline({ delay: 1.5, defaults: { ease: 'power3.out' } })
+      .from(heroImg, { scale: 1.18, duration: 2.4, ease: 'power2.out' }, 0)
+      .from('.hero__scrim', { opacity: 0, duration: 1.4, ease: 'power1.inOut' }, 0.15)
+      .from('.hero__label', { y: 26, autoAlpha: 0, duration: 0.9 }, 0.5)
+      .from('.hero__title .ml__i', { yPercent: 112, duration: 1.1, ease: 'power4.out', stagger: 0.12 }, 0.65)
+      .from('.hero__text', { y: 24, autoAlpha: 0, duration: 0.9 }, 1.05)
+      .from('.hero__scroll', { autoAlpha: 0, duration: 0.8 }, 1.6);
+
+    /* Generic scroll-in reveals */
+    Array.prototype.slice.call(doc.querySelectorAll('[data-reveal]')).forEach(function (el) {
+      gsap.from(el, {
+        y: 34, autoAlpha: 0, duration: 1, ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 88%' }
+      });
+    });
+
+    /* Masked display headings (achievement / follow / footer statements) */
+    Array.prototype.slice.call(doc.querySelectorAll('.masklines')).forEach(function (h) {
+      var lines = h.querySelectorAll('.ml__i');
+      if (!lines.length) { return; }
+      gsap.from(lines, {
+        yPercent: 112, duration: 1.05, ease: 'power4.out', stagger: 0.1,
+        scrollTrigger: { trigger: h, start: 'top 85%' }
+      });
+    });
+
+    /* Subtle parallax on masked images */
+    Array.prototype.slice.call(doc.querySelectorAll('.img-plx')).forEach(function (img) {
+      gsap.fromTo(img, { yPercent: -6 }, {
+        yPercent: 6, ease: 'none',
+        scrollTrigger: { trigger: img.closest('.frame') || img, start: 'top bottom', end: 'bottom top', scrub: true }
+      });
+    });
+  }
+
+  /* ---------- News filters + load more (works without GSAP / under reduced motion) ---------- */
+  var grid = doc.getElementById('newsGrid');
+  var statusEl = doc.getElementById('newsStatus');
+  var emptyEl = doc.getElementById('newsEmpty');
+  var loadBtn = doc.getElementById('loadMoreBtn');
+  var filterBtns = Array.prototype.slice.call(doc.querySelectorAll('.filter-btn'));
+  var items = grid ? Array.prototype.slice.call(grid.querySelectorAll('.news-item')) : [];
+  var currentFilter = 'all';
+  var canAnimate = hasGsap && !reduce;
+
+  function visibleItems() {
+    return items.filter(function (it) {
+      return !it.classList.contains('is-hidden');
+    });
+  }
+  function extrasLeft() {
+    return items.some(function (it) { return it.classList.contains('is-extra'); });
+  }
+
+  function updateStatus(shownCount) {
+    if (!statusEl) { return; }
+    var word = shownCount === 1 ? 'story' : 'stories';
+    var more = extrasLeft() ? ' · more available below' : ' · that\'s everything';
+    statusEl.textContent = 'Showing ' + shownCount + ' ' + word + more;
+    if (emptyEl) { emptyEl.style.display = shownCount ? 'none' : 'block'; }
+    if (loadBtn) { loadBtn.hidden = !extrasLeft(); }
+  }
+
+  function animateIn(els) {
+    if (!canAnimate || !els.length) { return; }
+    gsap.fromTo(els,
+      { autoAlpha: 0, y: 18 },
+      { autoAlpha: 1, y: 0, duration: 0.55, ease: 'power3.out', stagger: 0.05, clearProps: 'all' });
+  }
+
+  function applyFilter(cat, animate) {
+    currentFilter = cat;
+    items.forEach(function (it) {
+      var match = cat === 'all' || it.getAttribute('data-cat') === cat;
+      it.classList.toggle('is-hidden', !(match && !it.classList.contains('is-extra')));
+    });
+    var shown = visibleItems();
+    updateStatus(shown.length);
+    if (animate) { animateIn(shown); }
+    if (hasST) { ScrollTrigger.refresh(); }
+  }
+
+  filterBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      filterBtns.forEach(function (b) { b.setAttribute('aria-pressed', String(b === btn)); });
+      applyFilter(btn.getAttribute('data-filter') || 'all', true);
+    });
+  });
+
+  if (loadBtn) {
+    loadBtn.addEventListener('click', function () {
+      var extras = items.filter(function (it) { return it.classList.contains('is-extra'); });
+      extras.forEach(function (it) { it.classList.remove('is-extra'); });
+      /* re-apply the active filter to the newly revealed stories */
+      applyFilter(currentFilter, false);
+      /* animate only the stories that just appeared */
+      animateIn(extras.filter(function (it) { return !it.classList.contains('is-hidden'); }));
+      if (hasST) { ScrollTrigger.refresh(); }
+    });
+  }
+
+  /* initial state */
+  applyFilter('all', false);
+})();
+</script>
+</body>
+</html>
